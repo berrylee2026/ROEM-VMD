@@ -1274,7 +1274,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 <!-- ── 진열 맵 탭 ── -->
 <div class="map-view on" id="view-map" style="display: flex;">
   <div class="map-toolbar">
-    <button class="tbtn save" onclick="exportMapHTML()">💾 저장</button>
+    <button class="tbtn save" onclick="savePinsToSupabase()">💾 저장</button>
     <button class="tbtn ghost" id="moveBtnMap" onclick="toggleMoveMode()" style="">✥ 이동</button>
     <button class="tbtn primary on" id="addBtnMap" onclick="toggleAddMode()">
       <span class="blink"></span>
@@ -1359,7 +1359,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 </div><!-- /.app -->
 
 <!-- 전체 저장 버튼 -->
-<button class="global-save" onclick="exportAll()">💾 전체 저장</button>
+<button class="global-save" onclick="saveStores();savePinsToSupabase()">💾 전체 저장</button>
 
 <!-- 모델매장 미리보기 모달 -->
 <div class="modal-bg" id="modelPreviewBg" onclick="closeModelPreview(event)">
@@ -1450,7 +1450,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="viewer-counter" id="viewerCounter"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPA_URL = 'https://xfggdmlnjkdqsjedkhkq.supabase.co';
+const SUPA_KEY = 'sb_publishable_2IcP64uZYsfG0BLAY7_z4w_r2lDsohB';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
 // ════════════════════════════════
 //  공통 자산
 // ════════════════════════════════
@@ -1480,13 +1484,35 @@ document.getElementById('view-map').style.display='none';
 const STORES = ["영등포 타임스퀘어","스타필드 수원","스타필드 안성","스타필드 코엑스","AK수원","강남 이스퀘어","연수 스퀘어원","강서NC","부천NC","엔터식스 강남"];
 const DEFAULT_CHECKS = ["입구 마네킹 진열","메인 행거 구성","원형행거 스타일링","센터 테이블 연출","악세서리 진열","벽면 행거 구성","NEW 사인물 부착","조명 방향 확인"];
 
-let stores = JSON.parse(localStorage.getItem('roem_stores')||'null');
-if(!stores){
-  stores = STORES.map((name,i)=>({id:i,name,checks:DEFAULT_CHECKS.map(l=>({label:l,done:false,date:null}))}));
-  saveStores();
+let stores = [];
+
+async function loadStores(){
+  const {data, error} = await supa.from('stores').select('*').order('name');
+  if(data && data.length){
+    stores = data.map(s=>({
+      id: s.id,
+      name: s.name,
+      floor: s.floor_image||null,
+      checks: s.checks||[]
+    }));
+  } else {
+    stores = ["영등포 타임스퀘어","스타필드 수원","스타필드 안성","스타필드 코엑스","AK수원","강남 이스퀘어","연수 스퀘어원","강서NC","부천NC","엔터식스 강남"]
+      .map((name,i)=>({id:i,name,floor:null,checks:[]}));
+  }
+  renderDashboard();
 }
 
-function saveStores(){localStorage.setItem('roem_stores',JSON.stringify(stores));}
+async function saveStores(){
+  for(const s of stores){
+    await supa.from('stores').upsert({
+      id: s.id,
+      name: s.name,
+      floor_image: s.floor||null,
+      checks: s.checks,
+      updated_at: new Date().toISOString()
+    });
+  }
+}
 function getRate(s){if(!s.checks.length)return 0;return Math.round(s.checks.filter(c=>c.done).length/s.checks.length*100);}
 function getBarColor(r){return r===100?'var(--green)':r>=50?'#E9A800':'#C07060';}
 function getStatus(r){return r===100?{cls:'done',label:'완료'}:r>0?{cls:'progress',label:'진행 중'}:{cls:'none',label:'미시작'};}
@@ -2022,6 +2048,21 @@ function openFloorViewer(sid) {
 }
 
 // ── 전체 저장 ──
+async function savePinsToSupabase(){
+  await supa.from('pins').delete().neq('id', -1);
+  for(const p of pins){
+    await supa.from('pins').upsert({
+      id: p.id, x: p.x, y: p.y,
+      name: p.name, note: p.note,
+      photo_idx: p.photoIdx,
+      sales: p.sales||{},
+      updated_at: new Date().toISOString()
+    });
+  }
+  showMapToast('Supabase 저장 완료! ✓');
+  setTimeout(()=>showMapToast(''),2000);
+}
+
 function exportAll() {
   let src = document.documentElement.outerHTML;
   const pinData = pins.map(({id,x,y,name,note,photoIdx})=>({id,x,y,name,note,photoIdx}));
@@ -2035,7 +2076,7 @@ function exportAll() {
   setTimeout(()=>showMapToast(''),2000);
 }
 
-renderDashboard();
+loadStores();
 
 // 저장된 핀 복원
 (function restorePins(){
