@@ -59,29 +59,47 @@ input[type=date]:disabled{opacity:0.4}
 textarea{width:100%;background:#f8f7f5;border:0.5px solid #e8e5e0;border-radius:8px;padding:8px 10px;font-size:13px;color:#1a1a1a;font-family:inherit;outline:none;resize:vertical;line-height:1.6}
 textarea:disabled{opacity:0.4}
 .memo-label{font-size:11px;color:#aaa;margin-bottom:4px}
-.floor-upload{border:1px dashed #ddd;border-radius:10px;padding:24px;text-align:center;cursor:pointer;background:#f8f7f5}
-.floor-upload.readonly{pointer-events:none;opacity:0.4}
-.floor-upload .ico{font-size:24px;margin-bottom:6px}
-.floor-upload p{font-size:12px;color:#aaa}
+
+/* 구현맵 */
+.impl-upload-area{border:1px dashed #ddd;border-radius:10px;padding:24px;text-align:center;cursor:pointer;background:#f8f7f5;margin-bottom:10px}
+.impl-upload-area.readonly{pointer-events:none;opacity:0.5}
+.impl-upload-area .ico{font-size:24px;margin-bottom:6px}
+.impl-upload-area p{font-size:12px;color:#aaa}
 .map-toolbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
 .tool-btn{font-size:11px;padding:5px 10px;border-radius:8px;border:0.5px solid #ddd;background:#fff;color:#aaa;cursor:pointer}
 .tool-btn.on{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489;font-weight:500}
 .tool-btn.danger{color:#993C1D;border-color:#F0997B}
 .tool-btn:disabled{opacity:0.3;pointer-events:none}
 .hint{font-size:11px;color:#aaa;padding:3px 0 6px}
-.canvas-wrap{position:relative;border-radius:10px;overflow:hidden;border:0.5px solid #e8e5e0;margin-bottom:8px;user-select:none}
-.canvas-wrap img{display:block;width:100%;height:auto}
+.canvas-wrap{position:relative;border-radius:10px;overflow:hidden;border:0.5px solid #e8e5e0;margin-bottom:10px;user-select:none}
+.canvas-wrap img.floor-img{display:block;width:100%;height:auto}
 .canvas-wrap.pin-mode{cursor:crosshair}
-.pin{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;cursor:pointer;z-index:10}
-.pin-dot{width:20px;height:20px;border-radius:50%;background:#534AB7;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700}
-.pin-stem{width:2px;height:8px;background:#534AB7}
-.pin-tip{position:absolute;top:-32px;left:50%;transform:translateX(-50%);background:#fff;border:0.5px solid #ddd;border-radius:6px;padding:2px 6px;font-size:10px;white-space:nowrap;display:none;z-index:20}
+
+/* 핀 */
+.pin{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;z-index:10}
+.pin-dot{width:24px;height:24px;border-radius:50%;background:#534AB7;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.2);cursor:pointer}
+.pin-dot.has-photo{background:#D4537E}
+.pin-stem{width:2px;height:10px;background:#534AB7}
+.pin-tip{position:absolute;top:-34px;left:50%;transform:translateX(-50%);background:#fff;border:0.5px solid #ddd;border-radius:6px;padding:2px 8px;font-size:10px;white-space:nowrap;display:none;z-index:20;box-shadow:0 1px 4px rgba(0,0,0,0.1)}
 .pin:hover .pin-tip{display:block}
-.pin-list{display:flex;flex-direction:column;gap:4px}
-.pin-row{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;border:0.5px solid #e8e5e0;background:#fff}
-.pin-num{width:18px;height:18px;border-radius:50%;background:#534AB7;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.pin-row input{flex:1;border:none;background:transparent;font-size:12px;color:#1a1a1a;font-family:inherit;outline:none}
-.pin-del{font-size:12px;color:#ccc;cursor:pointer}
+
+/* 핀 목록 */
+.pin-list{display:flex;flex-direction:column;gap:8px}
+.pin-item{background:#f8f7f5;border-radius:10px;border:0.5px solid #e8e5e0;overflow:hidden}
+.pin-item-head{display:flex;align-items:center;gap:8px;padding:8px 10px}
+.pin-num-badge{width:20px;height:20px;border-radius:50%;background:#534AB7;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pin-num-badge.has-photo{background:#D4537E}
+.pin-name-input{flex:1;border:none;background:transparent;font-size:12px;color:#1a1a1a;font-family:inherit;outline:none;font-weight:500}
+.pin-name-input:disabled{color:#aaa}
+.pin-actions{display:flex;gap:4px;align-items:center}
+.pin-photo-btn{font-size:10px;padding:3px 8px;border-radius:6px;border:0.5px solid #AFA9EC;background:#EEEDFE;color:#3C3489;cursor:pointer;white-space:nowrap}
+.pin-del-btn{font-size:10px;padding:3px 6px;border-radius:6px;border:0.5px solid #F0997B;background:#FAECE7;color:#993C1D;cursor:pointer}
+.pin-photo-row{display:flex;align-items:center;gap:8px;padding:0 10px 10px}
+.pin-photo-thumb{width:60px;height:60px;border-radius:8px;object-fit:cover;cursor:pointer;border:0.5px solid #e8e5e0}
+.pin-photo-del{font-size:11px;color:#ccc;cursor:pointer;margin-top:2px}
+.pin-photo-del:hover{color:#993C1D}
+
+/* 핵심매장 */
 .store-list{display:flex;flex-direction:column;gap:7px}
 .store-row{background:#fff;border:0.5px solid #e8e5e0;border-radius:12px;padding:13px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
 .store-row.active{border:1.5px solid #534AB7}
@@ -132,17 +150,18 @@ textarea:disabled{opacity:0.4}
 .map-card-top{display:flex}
 .map-photo-wrap{width:130px;flex-shrink:0;overflow:hidden;background:#f0ede8;cursor:zoom-in;position:relative;min-height:100px}
 .map-photo-wrap img{width:100%;height:100%;object-fit:cover;display:block}
-.map-photo-empty{width:130px;flex-shrink:0;background:#f8f7f5;border-right:0.5px solid #e8e5e0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;min-height:100px;padding:10px}
-.map-photo-empty .ph-ico{font-size:22px;margin-bottom:4px;color:#ccc}
-.map-photo-empty .ph-txt{font-size:10px;color:#ccc;text-align:center}
+.map-photo-empty{width:130px;flex-shrink:0;background:#f8f7f5;border-right:0.5px solid #e8e5e0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100px;padding:10px}
+.map-photo-empty.clickable{cursor:pointer}
+.ph-ico{font-size:22px;margin-bottom:4px;color:#ccc}
+.ph-txt{font-size:10px;color:#ccc;text-align:center}
 .map-right{flex:1;display:flex;flex-direction:column;border-left:0.5px solid #f0ede8;min-width:0}
 .map-label{padding:10px 12px 7px;border-bottom:0.5px solid #f0ede8;display:flex;align-items:center;justify-content:space-between}
 .map-label-left{display:flex;align-items:center;gap:7px}
 .zone-idx{font-size:10px;font-weight:600;color:#aaa;background:#f5f4f2;padding:1px 6px;border-radius:8px;flex-shrink:0}
 .zone-name{font-size:13px;font-weight:600}
 .map-photo-actions{display:flex;gap:4px}
-.map-upload-btn{font-size:10px;padding:3px 8px;border-radius:6px;border:0.5px solid #AFA9EC;background:#EEEDFE;color:#3C3489;cursor:pointer;white-space:nowrap}
-.map-delete-btn{font-size:10px;padding:3px 8px;border-radius:6px;border:0.5px solid #F0997B;background:#FAECE7;color:#993C1D;cursor:pointer;white-space:nowrap}
+.map-upload-btn{font-size:10px;padding:3px 8px;border-radius:6px;border:0.5px solid #AFA9EC;background:#EEEDFE;color:#3C3489;cursor:pointer}
+.map-delete-btn{font-size:10px;padding:3px 8px;border-radius:6px;border:0.5px solid #F0997B;background:#FAECE7;color:#993C1D;cursor:pointer}
 .feedback-section{padding:8px 12px;flex:1;display:flex;flex-direction:column;gap:6px}
 .feedback-title{font-size:10px;font-weight:700;color:#534AB7;letter-spacing:0.04em}
 .feedback-list{display:flex;flex-direction:column;gap:4px}
@@ -155,7 +174,6 @@ textarea:disabled{opacity:0.4}
 .feedback-item-admin{font-size:10px;background:#EEEDFE;color:#3C3489;padding:1px 5px;border-radius:8px;margin-right:3px}
 .feedback-del{font-size:12px;color:#ccc;cursor:pointer;flex-shrink:0}
 .empty-fb{font-size:11px;color:#ccc;font-style:italic}
-.uploading{font-size:11px;color:#534AB7;font-style:italic}
 
 .lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;z-index:9998;flex-direction:column;gap:10px;padding:16px}
 .lightbox.open{display:flex}
@@ -182,6 +200,7 @@ textarea:disabled{opacity:0.4}
   <div class="tab" onclick="switchTab('mappage')">📐 진열 맵</div>
 </div>
 
+<!-- 모델매장 -->
 <div id="page-model" class="page active">
   <div class="sync-bar"><span class="sync-dot" id="sync-dot"></span><span id="sync-label">연결 중...</span></div>
   <div id="model-lock-bar" class="lock-bar">
@@ -214,25 +233,12 @@ textarea:disabled{opacity:0.4}
       </div>
     </div>
     <div id="sub-impl" class="sub-page">
-      <div id="impl-upload-area" class="floor-upload readonly" onclick="if(isAdmin)document.getElementById('impl-file').click()">
-        <div class="ico">📐</div><p>도면 이미지를 탭하여 업로드</p>
-        <input type="file" id="impl-file" accept="image/*" style="display:none">
-      </div>
-      <div id="impl-map-area" style="display:none">
-        <div class="map-toolbar">
-          <button class="tool-btn" id="btn-pin-mode" onclick="togglePinMode()" disabled>+ 핀 추가</button>
-          <button class="tool-btn" id="btn-move" onclick="toggleMoveMode()" disabled>이동 모드</button>
-          <button class="tool-btn danger" onclick="clearPins()" disabled>전체 삭제</button>
-          <button class="tool-btn" onclick="removeFloor()" disabled>도면 변경</button>
-        </div>
-        <div class="hint" id="impl-hint">핀 추가 버튼을 켜고 도면을 탭하세요</div>
-        <div class="canvas-wrap" id="canvas-wrap"><img id="impl-img" src="" alt="도면"></div>
-        <div class="pin-list" id="pin-list"></div>
-      </div>
+      <div id="impl-section"></div>
     </div>
   </div>
 </div>
 
+<!-- 핵심매장 -->
 <div id="page-core" class="page">
   <div class="sync-bar"><span class="sync-dot" id="sync-dot2"></span><span id="sync-label2">연결 중...</span></div>
   <div class="store-list" id="store-list"></div>
@@ -242,6 +248,7 @@ textarea:disabled{opacity:0.4}
   </div>
 </div>
 
+<!-- 진열 맵 -->
 <div id="page-mappage" class="page">
   <div class="sync-bar"><span class="sync-dot" id="sync-dot3"></span><span id="sync-label3">연결 중...</span></div>
   <div id="map-lock-bar" class="lock-bar">
@@ -251,6 +258,7 @@ textarea:disabled{opacity:0.4}
   <div class="map-list" id="map-list"></div>
 </div>
 
+<!-- PIN 모달 -->
 <div class="modal-overlay" id="pin-modal">
   <div class="modal">
     <div class="modal-title">관리자 PIN 입력</div>
@@ -311,7 +319,7 @@ const ZONE_META = [
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getDatabase, ref, set, onValue, push, remove } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-database.js";
+import { getDatabase, ref, set, onValue, push, remove, update } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB56TlWEzEWiBsZ5FFK54xqIrjJuTkXltA",
@@ -331,78 +339,74 @@ const stores = [{id:1,name:"강남 이스퀘어"},{id:2,name:"강서 NC"},{id:3,
 const coreZones = ["VP","VP 메인 바닥집기","WIN","메인 FACE"];
 
 let isAdmin = false, activeStore = null, openZones = {};
-let pins = [], pinMode = false, moveMode = false, dragPin = null, pinInput = '';
+let pinInput = '';
 let storeData = {};
 stores.forEach(s => { storeData[s.id] = coreZones.map(() => ({photo:null,checked:false,feedbacks:{}})); });
 
-// 진열맵 사진 상태 (Firebase에서 받아온 것 + 기본값)
+// 구현맵 상태
+let implFloor = null;   // 도면 base64
+let implPins = {};      // {id: {x,y,label,photo}}
+let pinMode = false, moveMode = false, dragPinId = null;
+let dragStartX = 0, dragStartY = 0, dragPinStartX = 0, dragPinStartY = 0;
+
+// 진열맵 사진
 let mapPhotos = {};
 ZONE_META.forEach(z => { mapPhotos[z.zid] = DEFAULT_PHOTOS[z.zid] || null; });
 
 function setSyncStatus(on) {
-  ['sync-dot','sync-dot2','sync-dot3'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.classList.toggle('on', on);
-  });
-  ['sync-label','sync-label2','sync-label3'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.textContent = on ? '실시간 연결됨' : '연결 중...';
-  });
+  ['sync-dot','sync-dot2','sync-dot3'].forEach(id => { const el=document.getElementById(id); if(el) el.classList.toggle('on',on); });
+  ['sync-label','sync-label2','sync-label3'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=on?'실시간 연결됨':'연결 중...'; });
 }
 
-// 모델매장 실시간
-onValue(ref(db, 'model'), snap => {
+// ── Firebase 실시간 수신 ──
+onValue(ref(db,'model'), snap => {
   setSyncStatus(true);
-  const data = snap.val() || {};
-  if(document.getElementById('date-start')) document.getElementById('date-start').value = data.dateStart || '';
-  if(document.getElementById('date-end')) document.getElementById('date-end').value = data.dateEnd || '';
-  if(document.getElementById('ta-memo')) document.getElementById('ta-memo').value = data.memo || '';
-  if(document.getElementById('ta-theme')) document.getElementById('ta-theme').value = data.theme || '';
-  if(document.getElementById('ta-detail')) document.getElementById('ta-detail').value = data.detail || '';
+  const d = snap.val()||{};
+  ['date-start','date-end','ta-memo','ta-theme','ta-detail'].forEach(id => { const el=document.getElementById(id); if(el) el.value=d[id.replace('-','').replace('ta-','')] || d[id] || ''; });
+  if(document.getElementById('date-start')) document.getElementById('date-start').value = d.dateStart||'';
+  if(document.getElementById('date-end')) document.getElementById('date-end').value = d.dateEnd||'';
+  if(document.getElementById('ta-memo')) document.getElementById('ta-memo').value = d.memo||'';
+  if(document.getElementById('ta-theme')) document.getElementById('ta-theme').value = d.theme||'';
+  if(document.getElementById('ta-detail')) document.getElementById('ta-detail').value = d.detail||'';
 });
 
-// 핵심매장 실시간
-onValue(ref(db, 'core'), snap => {
-  const data = snap.val() || {};
+onValue(ref(db,'implMap'), snap => {
+  const d = snap.val()||{};
+  implFloor = d.floor || null;
+  implPins = d.pins || {};
+  renderImplSection();
+});
+
+onValue(ref(db,'core'), snap => {
+  const d = snap.val()||{};
   stores.forEach(s => {
-    if(data[s.id]) {
-      coreZones.forEach((z,i) => {
-        if(data[s.id][i]) {
-          storeData[s.id][i].checked = data[s.id][i].checked || false;
-          storeData[s.id][i].photo = data[s.id][i].photo || null;
-          storeData[s.id][i].feedbacks = data[s.id][i].feedbacks || {};
-        }
-      });
-    }
+    if(d[s.id]) coreZones.forEach((_,i) => {
+      if(d[s.id][i]) {
+        storeData[s.id][i].checked = d[s.id][i].checked||false;
+        storeData[s.id][i].photo = d[s.id][i].photo||null;
+        storeData[s.id][i].feedbacks = d[s.id][i].feedbacks||{};
+      }
+    });
   });
   renderCore();
   if(activeStore) renderZoneCards();
 });
 
-// 진열맵 사진 실시간
-onValue(ref(db, 'mapPhotos'), snap => {
-  const data = snap.val() || {};
-  ZONE_META.forEach(z => {
-    if(data[z.zid] !== undefined) {
-      mapPhotos[z.zid] = data[z.zid];
-    }
-  });
+onValue(ref(db,'mapPhotos'), snap => {
+  const d = snap.val()||{};
+  ZONE_META.forEach(z => { if(d[z.zid]!==undefined) mapPhotos[z.zid]=d[z.zid]; });
   renderMapList();
 });
 
-// 진열맵 피드백 실시간
-onValue(ref(db, 'mapFeedbacks'), snap => {
-  const data = snap.val() || {};
-  ZONE_META.forEach(z => {
-    const el = document.getElementById('fl_' + z.zid);
-    if(el) renderMapFbList(z.zid, data[z.zid] || {});
-  });
+onValue(ref(db,'mapFeedbacks'), snap => {
+  const d = snap.val()||{};
+  ZONE_META.forEach(z => { const el=document.getElementById('fl_'+z.zid); if(el) renderMapFbList(z.zid, d[z.zid]||{}); });
 });
 
-// ── 저장 함수 ──
+// ── 저장 ──
 window.saveModel = function() {
   if(!isAdmin) return;
-  set(ref(db, 'model'), {
+  set(ref(db,'model'), {
     dateStart: document.getElementById('date-start').value,
     dateEnd: document.getElementById('date-end').value,
     memo: document.getElementById('ta-memo').value,
@@ -411,70 +415,272 @@ window.saveModel = function() {
   });
 };
 
-function saveCoreZone(sid, zi) {
-  set(ref(db, `core/${sid}/${zi}`), {
+function saveImplMap() {
+  set(ref(db,'implMap'), { floor: implFloor, pins: implPins });
+}
+
+function saveCoreZone(sid,zi) {
+  set(ref(db,`core/${sid}/${zi}`), {
     checked: storeData[sid][zi].checked,
-    photo: storeData[sid][zi].photo || null,
-    feedbacks: storeData[sid][zi].feedbacks || {}
+    photo: storeData[sid][zi].photo||null,
+    feedbacks: storeData[sid][zi].feedbacks||{}
   });
 }
 
-// ── 진열맵 사진 업로드/삭제 ──
-window.uploadMapPhoto = function(zid) {
-  if(!isAdmin) return;
-  const inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = 'image/*';
-  inp.onchange = function() {
-    const file = this.files[0]; if(!file) return;
-    // 압축
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX = 600;
-        let w = img.width, h = img.height;
-        if(w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        const compressed = canvas.toDataURL('image/jpeg', 0.6);
-        // 업로드 상태 표시
-        const statusEl = document.getElementById('map-upload-status-' + zid);
-        if(statusEl) statusEl.textContent = '업로드 중...';
-        set(ref(db, `mapPhotos/${zid}`), compressed).then(() => {
-          if(statusEl) statusEl.textContent = '';
-        });
-      };
-      img.src = e.target.result;
+// ── 이미지 압축 헬퍼 ──
+function compressImage(file, maxW, quality, cb) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w=img.width, h=img.height;
+      if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      cb(canvas.toDataURL('image/jpeg', quality));
     };
-    reader.readAsDataURL(file);
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── 구현맵 렌더링 ──
+function renderImplSection() {
+  const el = document.getElementById('impl-section');
+  if(!el) return;
+
+  const hasFloor = !!implFloor;
+  const adminBtns = isAdmin ? `
+    <div class="map-toolbar">
+      <button class="tool-btn ${pinMode?'on':''}" id="btn-pin-mode" onclick="togglePinMode()">+ 핀 추가</button>
+      <button class="tool-btn ${moveMode?'on':''}" id="btn-move" onclick="toggleMoveMode()">✥ 이동</button>
+      <button class="tool-btn danger" onclick="clearAllPins()">핀 전체 삭제</button>
+      <button class="tool-btn" onclick="changeFloor()">도면 변경</button>
+    </div>
+    <div class="hint" id="impl-hint">${pinMode?'도면을 탭하여 핀을 추가하세요':moveMode?'핀을 드래그하여 위치 조정':'핀 추가 버튼을 켜고 도면을 탭하세요'}</div>` : '';
+
+  if(!hasFloor) {
+    el.innerHTML = isAdmin
+      ? `<div class="impl-upload-area" onclick="uploadFloor()">
+          <div class="ico">📐</div>
+          <p>도면 이미지를 탭하여 업로드</p>
+          <p style="font-size:10px;color:#bbb;margin-top:4px">JPG · PNG</p>
+        </div>`
+      : `<div class="impl-upload-area readonly">
+          <div class="ico">📐</div><p>도면이 아직 없어요</p>
+        </div>`;
+    return;
+  }
+
+  const pinDots = Object.entries(implPins).map(([pid,p],i) => `
+    <div class="pin" id="pin_${pid}" style="left:${p.x}%;top:${p.y}%"
+      onmousedown="startDrag(event,'${pid}')"
+      ontouchstart="startDragTouch(event,'${pid}')">
+      <div class="pin-tip">${p.label||'핀 '+(i+1)}</div>
+      <div class="pin-dot ${p.photo?'has-photo':''}" onclick="handlePinClick(event,'${pid}')">${i+1}</div>
+      <div class="pin-stem"></div>
+    </div>`).join('');
+
+  const pinList = Object.entries(implPins).map(([pid,p],i) => `
+    <div class="pin-item">
+      <div class="pin-item-head">
+        <div class="pin-num-badge ${p.photo?'has-photo':''}">${i+1}</div>
+        <input class="pin-name-input" value="${p.label||'핀 '+(i+1)}" placeholder="구역명"
+          ${isAdmin?'':'disabled'}
+          onchange="updatePinLabel('${pid}',this.value)">
+        <div class="pin-actions">
+          ${isAdmin?`<span class="pin-photo-btn" onclick="uploadPinPhoto('${pid}')">📷 사진</span>
+          <span class="pin-del-btn" onclick="deletePin('${pid}')">×</span>`:''}
+        </div>
+      </div>
+      ${p.photo?`<div class="pin-photo-row">
+        <img class="pin-photo-thumb" src="${p.photo}" onclick="openLightbox('${p.label||'핀'}','${p.photo}')">
+        <div>
+          <div style="font-size:11px;color:#3B6D11">사진 등록됨</div>
+          ${isAdmin?`<div class="pin-photo-del" onclick="deletePinPhoto('${pid}')">× 삭제</div>`:''}
+        </div>
+      </div>`:''}
+    </div>`).join('');
+
+  el.innerHTML = `
+    ${adminBtns}
+    <div class="canvas-wrap ${pinMode?'pin-mode':''}" id="canvas-wrap"
+      onclick="handleCanvasClick(event)"
+      onmousemove="onDrag(event)" onmouseup="endDrag()"
+      ontouchmove="onDragTouch(event)" ontouchend="endDrag()">
+      <img class="floor-img" src="${implFloor}" alt="도면">
+      ${pinDots}
+    </div>
+    ${Object.keys(implPins).length>0?`<div class="pin-list">${pinList}</div>`:''}`;
+}
+
+window.uploadFloor = function() {
+  if(!isAdmin) return;
+  const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange = function() {
+    const file=this.files[0]; if(!file)return;
+    compressImage(file, 800, 0.75, compressed => {
+      implFloor = compressed;
+      saveImplMap();
+    });
   };
   inp.click();
 };
 
-window.deleteMapPhoto = function(zid) {
-  if(!isAdmin) return;
-  if(!confirm('이 사진을 삭제할까요?')) return;
-  set(ref(db, `mapPhotos/${zid}`), null);
+window.changeFloor = function() {
+  if(!isAdmin||!confirm('도면을 변경하면 기존 핀이 모두 삭제됩니다. 계속할까요?')) return;
+  implPins = {};
+  const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange = function() {
+    const file=this.files[0]; if(!file)return;
+    compressImage(file, 800, 0.75, compressed => {
+      implFloor = compressed;
+      saveImplMap();
+    });
+  };
+  inp.click();
 };
 
-// ── 진열맵 렌더링 ──
+window.togglePinMode = function() {
+  if(!isAdmin)return;
+  moveMode=false; pinMode=!pinMode;
+  renderImplSection();
+};
+window.toggleMoveMode = function() {
+  if(!isAdmin)return;
+  pinMode=false; moveMode=!moveMode;
+  renderImplSection();
+};
+window.clearAllPins = function() {
+  if(!isAdmin||!confirm('핀을 전체 삭제할까요?'))return;
+  implPins={}; saveImplMap();
+};
+
+window.handleCanvasClick = function(e) {
+  if(!isAdmin||!pinMode||e.target.closest('.pin')) return;
+  const wrap=document.getElementById('canvas-wrap');
+  const rect=wrap.getBoundingClientRect();
+  const x=((e.clientX-rect.left)/rect.width*100).toFixed(2);
+  const y=((e.clientY-rect.top)/rect.height*100).toFixed(2);
+  const pid='pin_'+Date.now();
+  const idx=Object.keys(implPins).length+1;
+  implPins[pid]={x:parseFloat(x),y:parseFloat(y),label:'핀 '+idx,photo:null};
+  saveImplMap();
+};
+
+window.handlePinClick = function(e, pid) {
+  e.stopPropagation();
+  if(moveMode) return;
+};
+
+window.startDrag = function(e, pid) {
+  if(!isAdmin||!moveMode)return;
+  e.preventDefault();
+  dragPinId=pid;
+  dragStartX=e.clientX; dragStartY=e.clientY;
+  dragPinStartX=implPins[pid].x; dragPinStartY=implPins[pid].y;
+};
+window.startDragTouch = function(e, pid) {
+  if(!isAdmin||!moveMode)return;
+  e.preventDefault();
+  const t=e.touches[0];
+  dragPinId=pid;
+  dragStartX=t.clientX; dragStartY=t.clientY;
+  dragPinStartX=implPins[pid].x; dragPinStartY=implPins[pid].y;
+};
+window.onDrag = function(e) {
+  if(!dragPinId)return;
+  const wrap=document.getElementById('canvas-wrap'); if(!wrap)return;
+  const rect=wrap.getBoundingClientRect();
+  const dx=(e.clientX-dragStartX)/rect.width*100;
+  const dy=(e.clientY-dragStartY)/rect.height*100;
+  implPins[dragPinId].x=Math.min(100,Math.max(0,dragPinStartX+dx));
+  implPins[dragPinId].y=Math.min(100,Math.max(0,dragPinStartY+dy));
+  // 실시간 DOM 업데이트
+  const pinEl=document.getElementById('pin_'+dragPinId);
+  if(pinEl){pinEl.style.left=implPins[dragPinId].x+'%';pinEl.style.top=implPins[dragPinId].y+'%';}
+};
+window.onDragTouch = function(e) {
+  if(!dragPinId)return; e.preventDefault();
+  const t=e.touches[0];
+  const wrap=document.getElementById('canvas-wrap'); if(!wrap)return;
+  const rect=wrap.getBoundingClientRect();
+  const dx=(t.clientX-dragStartX)/rect.width*100;
+  const dy=(t.clientY-dragStartY)/rect.height*100;
+  implPins[dragPinId].x=Math.min(100,Math.max(0,dragPinStartX+dx));
+  implPins[dragPinId].y=Math.min(100,Math.max(0,dragPinStartY+dy));
+  const pinEl=document.getElementById('pin_'+dragPinId);
+  if(pinEl){pinEl.style.left=implPins[dragPinId].x+'%';pinEl.style.top=implPins[dragPinId].y+'%';}
+};
+window.endDrag = function() {
+  if(!dragPinId)return;
+  saveImplMap();
+  dragPinId=null;
+};
+
+window.updatePinLabel = function(pid, val) {
+  if(!implPins[pid])return;
+  implPins[pid].label=val;
+  saveImplMap();
+};
+
+window.uploadPinPhoto = function(pid) {
+  if(!isAdmin)return;
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=function(){
+    const file=this.files[0]; if(!file)return;
+    compressImage(file, 600, 0.65, compressed => {
+      implPins[pid].photo=compressed;
+      saveImplMap();
+    });
+  };
+  inp.click();
+};
+
+window.deletePin = function(pid) {
+  if(!isAdmin)return;
+  delete implPins[pid];
+  saveImplMap();
+};
+
+window.deletePinPhoto = function(pid) {
+  if(!isAdmin)return;
+  implPins[pid].photo=null;
+  saveImplMap();
+};
+
+// ── 진열맵 ──
+window.uploadMapPhoto = function(zid) {
+  if(!isAdmin)return;
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=function(){
+    const file=this.files[0]; if(!file)return;
+    compressImage(file, 600, 0.65, compressed => {
+      set(ref(db,`mapPhotos/${zid}`), compressed);
+    });
+  };
+  inp.click();
+};
+window.deleteMapPhoto = function(zid) {
+  if(!isAdmin||!confirm('이 사진을 삭제할까요?'))return;
+  set(ref(db,`mapPhotos/${zid}`), null);
+};
+
 function renderMapList() {
   document.getElementById('map-list').innerHTML = ZONE_META.map(z => {
-    const src = mapPhotos[z.zid];
-    const photoHtml = src
-      ? `<div class="map-photo-wrap" onclick="openLightbox('${z.zone}','${src}')">
-          <img src="${src}" alt="${z.zone}">
-         </div>`
-      : `<div class="map-photo-empty" onclick="${isAdmin ? `uploadMapPhoto('${z.zid}')` : ''}">
+    const src=mapPhotos[z.zid];
+    const photoHtml=src
+      ?`<div class="map-photo-wrap" onclick="openLightbox('${z.zone}',this.querySelector('img').src)"><img src="${src}" alt="${z.zone}"></div>`
+      :`<div class="map-photo-empty ${isAdmin?'clickable':''}" onclick="${isAdmin?`uploadMapPhoto('${z.zid}`):''}')">
           <div class="ph-ico">📷</div>
-          <div class="ph-txt">${isAdmin ? '탭하여 업로드' : '사진 없음'}</div>
-         </div>`;
-    const adminBtns = isAdmin ? `
+          <div class="ph-txt">${isAdmin?'탭하여 업로드':'사진 없음'}</div>
+        </div>`;
+    const adminBtns=isAdmin?`
       <div class="map-photo-actions">
         <span class="map-upload-btn" onclick="uploadMapPhoto('${z.zid}')">교체</span>
-        ${src ? `<span class="map-delete-btn" onclick="deleteMapPhoto('${z.zid}')">삭제</span>` : ''}
-      </div>` : '';
+        ${src?`<span class="map-delete-btn" onclick="deleteMapPhoto('${z.zid}')">삭제</span>`:''}
+      </div>`:'';
     return `<div class="map-card">
       <div class="map-card-top">
         ${photoHtml}
@@ -483,8 +689,7 @@ function renderMapList() {
             <div class="map-label-left">
               <span class="zone-idx">${String(z.idx).padStart(2,'0')}</span>
               <span class="zone-name">${z.zone}</span>
-            </div>
-            ${adminBtns}
+            </div>${adminBtns}
           </div>
           <div class="feedback-section">
             <div class="feedback-title">VMD 피드백</div>
@@ -493,7 +698,6 @@ function renderMapList() {
               <textarea class="feedback-input" id="fi_${z.zid}" placeholder="피드백을 입력하세요" rows="2"></textarea>
               <button class="feedback-btn" onclick="addMapFeedback('${z.zid}')">등록</button>
             </div>
-            <div class="uploading" id="map-upload-status-${z.zid}"></div>
           </div>
         </div>
       </div>
@@ -501,54 +705,42 @@ function renderMapList() {
   }).join('');
 }
 
-// ── 진열맵 피드백 ──
 window.addMapFeedback = function(zid) {
-  const inp = document.getElementById('fi_' + zid);
-  const text = inp ? inp.value.trim() : '';
-  if(!text) return;
-  const now = new Date();
-  const time = (now.getMonth()+1)+'/'+now.getDate()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  push(ref(db, `mapFeedbacks/${zid}`), {text, time, isAdmin});
-  inp.value = '';
+  const inp=document.getElementById('fi_'+zid);
+  const text=inp?inp.value.trim():''; if(!text)return;
+  const now=new Date();
+  const time=(now.getMonth()+1)+'/'+now.getDate()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  push(ref(db,`mapFeedbacks/${zid}`),{text,time,isAdmin});
+  inp.value='';
 };
-
-function renderMapFbList(zid, fbObj) {
-  const el = document.getElementById('fl_' + zid);
-  if(!el) return;
-  const list = Object.entries(fbObj);
-  if(!list.length) { el.innerHTML = '<div class="empty-fb">아직 피드백이 없어요</div>'; return; }
-  el.innerHTML = list.map(([fid, f]) => `
+function renderMapFbList(zid,fbObj){
+  const el=document.getElementById('fl_'+zid); if(!el)return;
+  const list=Object.entries(fbObj);
+  if(!list.length){el.innerHTML='<div class="empty-fb">아직 피드백이 없어요</div>';return;}
+  el.innerHTML=list.map(([fid,f])=>`
     <div class="feedback-item">
-      <div class="feedback-item-text">
-        ${f.isAdmin ? '<span class="feedback-item-admin">관리자</span>' : ''}${f.text}
-        <div class="feedback-item-time">${f.time}</div>
-      </div>
-      ${isAdmin ? `<span class="feedback-del" onclick="delMapFb('${zid}','${fid}')">×</span>` : ''}
+      <div class="feedback-item-text">${f.isAdmin?'<span class="feedback-item-admin">관리자</span>':''}${f.text}<div class="feedback-item-time">${f.time}</div></div>
+      ${isAdmin?`<span class="feedback-del" onclick="delMapFb('${zid}','${fid}')">×</span>`:''}
     </div>`).join('');
 }
-
-window.delMapFb = function(zid, fid) {
-  remove(ref(db, `mapFeedbacks/${zid}/${fid}`));
-};
+window.delMapFb = function(zid,fid){remove(ref(db,`mapFeedbacks/${zid}/${fid}`));};
 
 // ── 인증 ──
-window.handleAuthClick = function() { isAdmin ? logout() : openPinModal(); };
-window.openPinModal = function() { pinInput=''; document.getElementById('pin-err').textContent=''; updateDots(); document.getElementById('pin-modal').classList.add('open'); };
-window.closeModal = function() { document.getElementById('pin-modal').classList.remove('open'); pinInput=''; updateDots(); };
-window.pressKey = function(k) {
+window.handleAuthClick=function(){isAdmin?logout():openPinModal();};
+window.openPinModal=function(){pinInput='';document.getElementById('pin-err').textContent='';updateDots();document.getElementById('pin-modal').classList.add('open');};
+window.closeModal=function(){document.getElementById('pin-modal').classList.remove('open');pinInput='';updateDots();};
+window.pressKey=function(k){
   if(k==='del'){pinInput=pinInput.slice(0,-1);updateDots();return;}
   if(pinInput.length>=4)return;
-  pinInput+=k; updateDots();
-  if(pinInput.length===4) setTimeout(checkPin, 120);
+  pinInput+=k;updateDots();
+  if(pinInput.length===4)setTimeout(checkPin,120);
 };
 function updateDots(){for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);d.classList.toggle('filled',i<pinInput.length);d.classList.remove('error');}}
 function checkPin(){
   if(pinInput===ADMIN_PIN){isAdmin=true;closeModal();applyAuth();}
-  else{
-    for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.add('error');
+  else{for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.add('error');
     document.getElementById('pin-err').textContent='PIN이 올바르지 않아요';
-    setTimeout(()=>{pinInput='';updateDots();document.getElementById('pin-err').textContent='';},900);
-  }
+    setTimeout(()=>{pinInput='';updateDots();document.getElementById('pin-err').textContent='';},900);}
 }
 function logout(){isAdmin=false;applyAuth();}
 function applyAuth(){
@@ -557,65 +749,23 @@ function applyAuth(){
   document.getElementById('model-lock-bar').style.display=isAdmin?'none':'flex';
   document.getElementById('map-lock-bar').style.display=isAdmin?'none':'flex';
   ['date-start','date-end','ta-memo','ta-theme','ta-detail'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=!isAdmin;});
-  document.getElementById('impl-upload-area').classList.toggle('readonly',!isAdmin);
-  ['btn-pin-mode','btn-move'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=!isAdmin;});
+  renderImplSection();
   renderMapList();
+  if(activeStore)renderZoneCards();
 }
 
-window.switchTab = function(tab){
+window.switchTab=function(tab){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['model','core','mappage'][i]===tab));
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+tab).classList.add('active');
 };
-window.switchSub = function(sub){
+window.switchSub=function(sub){
   document.querySelectorAll('.sub-tab').forEach((t,i)=>t.classList.toggle('active',['launch','intro','impl'][i]===sub));
   document.querySelectorAll('.sub-page').forEach(p=>p.classList.remove('active'));
   document.getElementById('sub-'+sub).classList.add('active');
 };
 
-// 구현맵 핀
-document.getElementById('impl-file').addEventListener('change',function(){
-  if(!isAdmin)return;
-  const file=this.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{document.getElementById('impl-img').src=e.target.result;document.getElementById('impl-upload-area').style.display='none';document.getElementById('impl-map-area').style.display='block';renderPins();};
-  reader.readAsDataURL(file);
-});
-window.removeFloor=function(){pins=[];pinMode=false;moveMode=false;document.getElementById('impl-img').src='';document.getElementById('impl-upload-area').style.display='block';document.getElementById('impl-map-area').style.display='none';document.getElementById('impl-file').value='';};
-window.togglePinMode=function(){if(!isAdmin)return;moveMode=false;pinMode=!pinMode;document.getElementById('btn-pin-mode').classList.toggle('on',pinMode);document.getElementById('btn-move').classList.remove('on');document.getElementById('canvas-wrap').classList.toggle('pin-mode',pinMode);};
-window.toggleMoveMode=function(){if(!isAdmin)return;pinMode=false;moveMode=!moveMode;document.getElementById('btn-move').classList.toggle('on',moveMode);document.getElementById('btn-pin-mode').classList.remove('on');document.getElementById('canvas-wrap').classList.remove('pin-mode');};
-window.clearPins=function(){if(!isAdmin)return;pins=[];renderPins();};
-document.getElementById('canvas-wrap').addEventListener('click',function(e){
-  if(!isAdmin||!pinMode||e.target.closest('.pin'))return;
-  const rect=this.getBoundingClientRect();
-  pins.push({id:Date.now(),x:(e.clientX-rect.left)/rect.width*100,y:(e.clientY-rect.top)/rect.height*100,label:'핀 '+(pins.length+1)});
-  renderPins();
-});
-document.addEventListener('mousemove',function(e){
-  if(!isAdmin||dragPin===null)return;
-  const wrap=document.getElementById('canvas-wrap');const rect=wrap.getBoundingClientRect();
-  const p=pins.find(p=>p.id===dragPin);
-  if(p){p.x=Math.min(100,Math.max(0,(e.clientX-rect.left)/rect.width*100));p.y=Math.min(100,Math.max(0,(e.clientY-rect.top)/rect.height*100));renderPins();}
-});
-document.addEventListener('mouseup',()=>{dragPin=null;});
-window.deletePin=function(id){if(!isAdmin)return;pins=pins.filter(p=>p.id!==id);pins.forEach((p,i)=>{if(!p.userLabel)p.label='핀 '+(i+1);});renderPins();};
-window.updatePinLabel=function(id,val){const p=pins.find(p=>p.id===id);if(p){p.label=val;p.userLabel=true;renderPins();}};
-function renderPins(){
-  const wrap=document.getElementById('canvas-wrap');
-  wrap.querySelectorAll('.pin').forEach(el=>el.remove());
-  pins.forEach((p,i)=>{
-    const el=document.createElement('div');el.className='pin';el.style.left=p.x+'%';el.style.top=p.y+'%';
-    el.innerHTML=`<div class="pin-tip">${p.label}</div><div class="pin-dot">${i+1}</div><div class="pin-stem"></div>`;
-    if(isAdmin)el.addEventListener('mousedown',e=>{if(!moveMode)return;e.preventDefault();dragPin=p.id;});
-    wrap.appendChild(el);
-  });
-  document.getElementById('pin-list').innerHTML=pins.map((p,i)=>`
-    <div class="pin-row"><div class="pin-num">${i+1}</div>
-    <input value="${p.label}" placeholder="구역명" ${isAdmin?'':'disabled'} onchange="updatePinLabel(${p.id},this.value)">
-    ${isAdmin?`<span class="pin-del" onclick="deletePin(${p.id})">×</span>`:''}</div>`).join('');
-}
-
-// 핵심매장
+// ── 핵심매장 ──
 function getCoreDone(sid){return storeData[sid].filter(d=>d.checked).length;}
 window.openChecklist=function(sid){
   if(activeStore===sid){closeChecklist();return;}
@@ -632,23 +782,9 @@ window.toggleZoneOpen=function(zi){openZones[zi]=!openZones[zi];renderZoneCards(
 window.toggleCheck=function(sid,zi){storeData[sid][zi].checked=!storeData[sid][zi].checked;saveCoreZone(sid,zi);renderZoneCards();renderCore();};
 window.uploadZonePhoto=function(sid,zi){
   const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
-  inp.onchange=function(){
-    const file=this.files[0];if(!file)return;
-    const reader=new FileReader();
-    reader.onload=e=>{
-      const img=new Image();
-      img.onload=()=>{
-        const canvas=document.createElement('canvas');
-        const MAX=600;let w=img.width,h=img.height;
-        if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
-        canvas.width=w;canvas.height=h;
-        canvas.getContext('2d').drawImage(img,0,0,w,h);
-        storeData[sid][zi].photo=canvas.toDataURL('image/jpeg',0.6);
-        storeData[sid][zi].checked=true;
-        saveCoreZone(sid,zi);renderZoneCards();renderCore();
-      };img.src=e.target.result;
-    };reader.readAsDataURL(file);
-  };inp.click();
+  inp.onchange=function(){const file=this.files[0];if(!file)return;
+    compressImage(file,600,0.65,compressed=>{storeData[sid][zi].photo=compressed;storeData[sid][zi].checked=true;saveCoreZone(sid,zi);renderZoneCards();renderCore();});};
+  inp.click();
 };
 window.removeZonePhoto=function(sid,zi){storeData[sid][zi].photo=null;saveCoreZone(sid,zi);renderZoneCards();renderCore();};
 window.sendCoreFb=function(sid,zi){
@@ -656,7 +792,7 @@ window.sendCoreFb=function(sid,zi){
   const text=inp?inp.value.trim():'';if(!text)return;
   const now=new Date();
   const time=(now.getMonth()+1)+'/'+now.getDate()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  push(ref(db,`core/${sid}/${zi}/feedbacks`), {text,time,isAdmin});
+  push(ref(db,`core/${sid}/${zi}/feedbacks`),{text,time,isAdmin});
   inp.value='';
 };
 window.deleteCoreFb=function(sid,zi,fid){remove(ref(db,`core/${sid}/${zi}/feedbacks/${fid}`));};
@@ -708,6 +844,7 @@ window.closeLightbox=function(){document.getElementById('lightbox').classList.re
 
 renderCore();
 renderMapList();
+renderImplSection();
 applyAuth();
 </script>
 </body>
