@@ -832,9 +832,15 @@ function rZC(){
     var fbs=Object.entries(d.fb||{});
     if(fbs.length){var fbl=el("div","fbl");fbs.forEach(function(en){var fid=en[0],f=en[1];var item=el("div","fbi");var fbt=el("div","fbt");if(f.isA){var tag=el("span","at");tag.textContent="관리자";fbt.appendChild(tag);}fbt.appendChild(txt(f.text));var ftm=el("div","ftm");ftm.textContent=f.time;fbt.appendChild(ftm);item.appendChild(fbt);if(isA){var fd=el("span","fd");fd.textContent="x";(function(sid,i,fid){fd.onclick=function(){dFb(sid,i,fid);};})(sid,i,fid);item.appendChild(fd);}fbl.appendChild(item);});zb.appendChild(fbl);}
     zc.appendChild(zh);zc.appendChild(zb);zcs.appendChild(zc);
-    // 추가 사진 섹션
-    var extra=CD[sid].extra||{};
-    var extraList=Object.entries(extra);
+  });
+
+  // 추가 사진 섹션 (맨 아래)
+  var extra=CD[sid].extra||{};
+  var extraList=Object.entries(extra);
+  if(extraList.length>0){
+    var extraTitle=el("div");extraTitle.style.cssText="font-size:11px;font-weight:700;color:#aaa;padding:8px 0 4px;letter-spacing:0.04em";
+    extraTitle.textContent="추가 사진";
+    zcs.appendChild(extraTitle);
     extraList.forEach(function(en){
       var key=en[0],ex=en[1];
       var ec=el("div","extra-card");
@@ -853,14 +859,14 @@ function rZC(){
       }
       zcs.appendChild(ec);
     });
-    // 추가 사진 버튼
-    var addBar=el("div","add-photo-bar");
-    var addInp=el("input","add-photo-input");addInp.id="extra-name-"+sid;addInp.placeholder="추가 사진 이름 (예: FACE2, FACE3...)";
-    var addBtn=el("button","add-photo-btn");addBtn.textContent="+ 사진 추가";
-    (function(sid){addBtn.onclick=function(){addExtraPhoto(sid);};})(sid);
-    addBar.appendChild(addInp);addBar.appendChild(addBtn);
-    zcs.appendChild(addBar);
-  });
+  }
+  // 추가 사진 버튼
+  var addBar=el("div","add-photo-bar");
+  var addInp=el("input","add-photo-input");addInp.id="extra-name-"+sid;addInp.placeholder="추가 사진 이름 (예: FACE2, FACE3...)";
+  var addBtn=el("button","add-photo-btn");addBtn.textContent="+ 사진 추가";
+  (function(sid){addBtn.onclick=function(){addExtraPhoto(sid);};})(sid);
+  addBar.appendChild(addInp);addBar.appendChild(addBtn);
+  zcs.appendChild(addBar);
 }
 function rCore(){
   var sl=document.getElementById("slist");sl.innerHTML="";
