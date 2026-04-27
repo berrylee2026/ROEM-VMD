@@ -526,6 +526,21 @@ function rImpl() {
     wrap.appendChild(pl);
   }
 }
+function movePin(pid, dir){
+  if(!isA)return;
+  var pids=Object.keys(iPins);
+  var idx=pids.indexOf(pid);
+  if(idx===-1)return;
+  var newIdx=idx+dir;
+  if(newIdx<0||newIdx>=pids.length)return;
+  // 두 핀의 모든 데이터 swap
+  var a=pids[idx], b=pids[newIdx];
+  var tmpA=JSON.parse(JSON.stringify(iPins[a]));
+  var tmpB=JSON.parse(JSON.stringify(iPins[b]));
+  iPins[a]=tmpB;
+  iPins[b]=tmpA;
+  sImpl();
+}
 function upFloor(){if(!isA)return;pick(function(f){comp(f,800,0.75,function(c){iFloor=c;sImpl();});});}
 function chgF(){if(!isA||!confirm("도면 변경 시 기존 핀이 삭제됩니다"))return;iPins={};pick(function(f){comp(f,800,0.75,function(c){iFloor=c;sImpl();});});}
 function tPin(){if(!isA)return;movM=false;pinM=!pinM;rImpl();}
