@@ -809,6 +809,31 @@ function sFb(sid,zi){var inp=document.getElementById("cfi_"+sid+"_"+zi);var t=in
 function dFb(sid,zi,fid){db.ref("core/"+sid+"/"+zi+"/fb/"+fid).remove();}
 function rZC(){
   if(actS===null)return;var sid=actS,zcs=document.getElementById("zcs");zcs.innerHTML="";
+
+  // 매장 기준 설정 섹션 (관리자만)
+  if(isA){
+    var critBox=el("div","store-criteria");
+    var critTitle=el("div","criteria-title");critTitle.textContent="📋 매장별 평가 기준 설정";
+    critBox.appendChild(critTitle);
+    var savedCrit=(storeCriteria[sid])||{};
+    CZ.forEach(function(z){
+      var row=el("div","criteria-row");
+      var lbl=el("div","criteria-label");lbl.textContent=z;
+      var inp=el("textarea","criteria-input");
+      inp.id="crit_"+sid+"_"+z.replace(/ /g,"_");
+      inp.rows=2;
+      inp.placeholder="예: W900 페이스, 8SKU 기준, 마네킹 2체 등";
+      inp.value=savedCrit[z]||"";
+      row.appendChild(lbl);row.appendChild(inp);
+      critBox.appendChild(row);
+    });
+    var saveBtn=el("button","criteria-save-btn");
+    saveBtn.textContent="기준 저장";
+    (function(sid){saveBtn.onclick=function(){saveStoreCriteria(sid);};})(sid);
+    critBox.appendChild(saveBtn);
+    zcs.appendChild(critBox);
+  }
+
   CZ.forEach(function(z,i){
     var d=CD[sid][i],isO=opZ[i];
     var zc=el("div","zc"+(d.checked?" done":""));
