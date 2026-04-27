@@ -686,7 +686,7 @@ function delExtraPhoto(sid,key){
 }
 function closeClp(){actS=null;document.getElementById("clp").classList.remove("on");document.querySelectorAll(".sr").forEach(function(r){r.classList.remove("on");});}
 function tZ(zi){opZ[zi]=!opZ[zi];rZC();}
-function tChk(sid,zi){CD[sid][zi].checked=!CD[sid][zi].checked;sCore(sid,zi);rZC();rCore();}
+function tChk(sid,zi){if(!CD[sid][zi].photo){alert('사진을 먼저 업로드해 주세요!');return;}CD[sid][zi].checked=!CD[sid][zi].checked;sCore(sid,zi);rZC();rCore();}
 function upZPh(sid,zi){pick(function(f){comp(f,600,0.65,function(c){CD[sid][zi].photo=c;CD[sid][zi].checked=true;sCore(sid,zi);rZC();rCore();aiEval(sid,zi,c);});});}
 
 function aiEval(sid,zi,photo){
