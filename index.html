@@ -577,7 +577,7 @@ function aiEval(sid,zi,photo){
     userContent.push({type:"text",text:"\n(기준 사진 없음 - VMD 전문가로서 일반적인 기준으로 평가해 주세요)"});
   }
 
-  fetch("https://api.anthropic.com/v1/messages",{
+  fetch("https://2026.leejuyeon337.workers.dev/",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
