@@ -151,6 +151,13 @@ textarea:disabled{opacity:0.4}
 .ft2{flex:1;line-height:1.5}.ftm2{font-size:10px;color:#aaa;margin-top:1px}
 .fd2{font-size:12px;color:#ccc;cursor:pointer;flex-shrink:0}
 .nf{font-size:11px;color:#ccc;font-style:italic}
+.add-photo-bar{display:flex;gap:6px;align-items:center;margin-top:8px;padding-top:8px;border-top:0.5px dashed #e8e5e0}
+.add-photo-input{flex:1;background:#f8f7f5;border:0.5px solid #e8e5e0;border-radius:8px;padding:7px 10px;font-size:12px;color:#1a1a1a;font-family:inherit;outline:none}
+.add-photo-btn{font-size:11px;padding:7px 12px;border-radius:8px;border:0.5px solid #AFA9EC;background:#EEEDFE;color:#3C3489;cursor:pointer;white-space:nowrap}
+.extra-card{background:#fff;border:0.5px solid #e8e5e0;border-radius:10px;overflow:hidden;margin-top:6px}
+.extra-head{display:flex;align-items:center;gap:8px;padding:10px 12px}
+.extra-name{font-size:13px;font-weight:500;flex:1}
+.extra-del{font-size:11px;color:#ccc;cursor:pointer}
 .lb{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;z-index:9998;flex-direction:column;gap:10px;padding:16px}
 .lb.on{display:flex}
 .lb img{max-width:94vw;max-height:84vh;object-fit:contain;border-radius:8px}
@@ -250,7 +257,7 @@ var SS = [
 var CZ = ["VP","VP 메인 바닥집기","WIN","메인 FACE"];
 var isA = false, actS = null, opZ = {}, ps = "";
 var CD = {};
-SS.forEach(function(s) { CD[s.id] = CZ.map(function() { return {photo:null,checked:false,fb:{}}; }); });
+SS.forEach(function(s) { CD[s.id] = CZ.map(function() { return {photo:null,checked:false,fb:{}}; }); CD[s.id].extra={}; });
 var iFloor=null, iPins={}, pinM=false, movM=false, dragId=null;
 var dsx=0, dsy=0, dpx=0, dpy=0;
 // 진열맵: Firebase에서 관리 {zid: {name, photo, order}}
@@ -547,6 +554,22 @@ function goSt(i){document.querySelectorAll(".st").forEach(function(t,j){t.classL
 // ── 핵심매장 ──
 function getDone(sid){return CD[sid].filter(function(d){return d.checked;}).length;}
 function openClp(sid){if(actS===sid){closeClp();return;}actS=sid;opZ={};document.getElementById("clt").textContent=SS.find(function(s){return s.id===sid;}).n;rZC();document.getElementById("clp").classList.add("on");document.querySelectorAll(".sr").forEach(function(r){r.classList.remove("on");});document.querySelector(".sr[data-id='"+sid+"']").classList.add("on");setTimeout(function(){document.getElementById("clp").scrollIntoView({behavior:"smooth",block:"nearest"});},50);}
+function addExtraPhoto(sid){
+  var inp=document.getElementById("extra-name-"+sid);
+  var name=inp?inp.value.trim():"";
+  if(!name){alert("사진 이름을 입력해 주세요");return;}
+  pick(function(f){
+    comp(f,600,0.65,function(c){
+      var key="extra_"+Date.now();
+      db.ref("core/"+sid+"/extra/"+key).set({name:name,photo:c});
+      if(inp)inp.value="";
+    });
+  });
+}
+function delExtraPhoto(sid,key){
+  if(!confirm("삭제할까요?"))return;
+  db.ref("core/"+sid+"/extra/"+key).remove();
+}
 function closeClp(){actS=null;document.getElementById("clp").classList.remove("on");document.querySelectorAll(".sr").forEach(function(r){r.classList.remove("on");});}
 function tZ(zi){opZ[zi]=!opZ[zi];rZC();}
 function tChk(sid,zi){CD[sid][zi].checked=!CD[sid][zi].checked;sCore(sid,zi);rZC();rCore();}
@@ -691,6 +714,34 @@ function rZC(){
     var fbs=Object.entries(d.fb||{});
     if(fbs.length){var fbl=el("div","fbl");fbs.forEach(function(en){var fid=en[0],f=en[1];var item=el("div","fbi");var fbt=el("div","fbt");if(f.isA){var tag=el("span","at");tag.textContent="관리자";fbt.appendChild(tag);}fbt.appendChild(txt(f.text));var ftm=el("div","ftm");ftm.textContent=f.time;fbt.appendChild(ftm);item.appendChild(fbt);if(isA){var fd=el("span","fd");fd.textContent="x";(function(sid,i,fid){fd.onclick=function(){dFb(sid,i,fid);};})(sid,i,fid);item.appendChild(fd);}fbl.appendChild(item);});zb.appendChild(fbl);}
     zc.appendChild(zh);zc.appendChild(zb);zcs.appendChild(zc);
+    // 추가 사진 섹션
+    var extra=CD[sid].extra||{};
+    var extraList=Object.entries(extra);
+    extraList.forEach(function(en){
+      var key=en[0],ex=en[1];
+      var ec=el("div","extra-card");
+      var eh=el("div","extra-head");
+      var en2=el("div","extra-name");en2.textContent=ex.name;
+      eh.appendChild(en2);
+      if(isA){var edel=el("span","extra-del");edel.textContent="× 삭제";(function(sid,key){edel.onclick=function(){delExtraPhoto(sid,key);};})(sid,key);eh.appendChild(edel);}
+      ec.appendChild(eh);
+      if(ex.photo){
+        var pr2=el("div","pr");
+        var pt2=el("img","pt");pt2.src=ex.photo;
+        var nn=ex.name,ss2=ex.photo;pt2.onclick=function(){openLb(nn,ss2);};
+        pr2.appendChild(pt2);
+        var info2=el("div");var ok2=el("div","ps ok");ok2.textContent="사진 등록됨";info2.appendChild(ok2);
+        pr2.appendChild(info2);ec.appendChild(pr2);
+      }
+      zcs.appendChild(ec);
+    });
+    // 추가 사진 버튼
+    var addBar=el("div","add-photo-bar");
+    var addInp=el("input","add-photo-input");addInp.id="extra-name-"+sid;addInp.placeholder="추가 사진 이름 (예: FACE2, FACE3...)";
+    var addBtn=el("button","add-photo-btn");addBtn.textContent="+ 사진 추가";
+    (function(sid){addBtn.onclick=function(){addExtraPhoto(sid);};})(sid);
+    addBar.appendChild(addInp);addBar.appendChild(addBtn);
+    zcs.appendChild(addBar);
   });
 }
 function rCore(){
