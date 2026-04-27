@@ -548,65 +548,74 @@ function tChk(sid,zi){CD[sid][zi].checked=!CD[sid][zi].checked;sCore(sid,zi);rZC
 function upZPh(sid,zi){pick(function(f){comp(f,600,0.65,function(c){CD[sid][zi].photo=c;CD[sid][zi].checked=true;sCore(sid,zi);rZC();rCore();aiEval(sid,zi,c);});});}
 
 function aiEval(sid,zi,photo){
-  // 기준 사진 수집: 진열맵 + 구현맵 핀 사진
-  var refImgs=[];
-  // 진열맵 사진
-  Object.values(mapZones).forEach(function(z){if(z.photo)refImgs.push(z.photo);});
-  // 구현맵 핀 사진
-  Object.values(iPins).forEach(function(p){if(p.photo)refImgs.push(p.photo);});
-
   var zoneName=CZ[zi];
   var storeName=SS.find(function(s){return s.id===sid;}).n;
-
-  // 피드백에 "AI 평가 중..." 표시
   var now=new Date();
   var tm=(now.getMonth()+1)+"/"+now.getDate()+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
   var loadingKey=null;
-  db.ref("core/"+sid+"/"+zi+"/fb").push({text:"AI 평가 중...",time:tm,isA:true,aiLoading:true}).then(function(ref){loadingKey=ref.key;});
+  db.ref("core/"+sid+"/"+zi+"/fb").push({text:"🤖 AI 평가 중...",time:tm,isA:true}).then(function(ref){loadingKey=ref.key;});
 
-  // 메시지 구성
+  // 구역별 체크리스트 기준
+  var criteria = {
+    "VP": [
+      {no:1, item:"메인VP존 마네킹은 전마 상품으로 풀코디 착장한다.", score:10},
+      {no:2, item:"마네킹 사양이 통일 되어 있다.", score:10},
+      {no:3, item:"전마 상품 POP가 해당 조닝에 고지 되어 있다.", score:10}
+    ],
+    "VP 메인 바닥집기": [
+      {no:4, item:"VP메인 바닥집기 행어링된 상품(컬러, 아이템) 교육자료와 동일하다.", score:10},
+      {no:5, item:"VP메인 바닥집기 상품이 유사한 간격으로 행어링 되어 있다.", score:10}
+    ],
+    "WIN": [
+      {no:6, item:"메인VP존 마네킹은 전마 상품으로 풀코디 착장한다.", score:10},
+      {no:7, item:"마네킹 사양이 통일 되어 있다.", score:10},
+      {no:8, item:"전마 상품 POP가 해당 조닝에 고지 되어 있다.", score:10}
+    ],
+    "메인 FACE": [
+      {no:9, item:"W1,200 페이스 기준 10SKU 진열한다.(앞보기3, 옆보기7SKU)", score:10},
+      {no:10, item:"메인FACE 행어링된 상품(컬러, 아이템) 교육자료와 동일하다.", score:10}
+    ]
+  };
+
+  var zoneItems = criteria[zoneName] || [];
+  var criteriaText = zoneItems.map(function(c){
+    return "No."+c.no+" ("+c.score+"점): "+c.item;
+  }).join("\n");
+
+  var refImgs=[];
+  Object.values(mapZones).forEach(function(z){if(z.photo)refImgs.push(z.photo);});
+  Object.values(iPins).forEach(function(p){if(p.photo)refImgs.push(p.photo);});
+
   var userContent=[];
-  userContent.push({type:"text",text:"당신은 패션 브랜드 ROEM의 VMD(비주얼 머천다이징) 전문가입니다.\n\n[평가 대상]\n매장: "+storeName+"\n구역: "+zoneName+"\n\n아래 업로드된 사진이 기준 사진(진열맵/모델매장 구현맵)과 비교했을 때 VMD가 잘 되었는지 평가해 주세요.\n\n평가 항목:\n1. 진열 구성이 기준과 유사한지\n2. 상품 배치와 연출이 적절한지\n3. 개선이 필요한 부분\n\n3~5문장으로 간결하게 한국어로 답변해 주세요."});
+  userContent.push({type:"text",text:"당신은 패션 브랜드 ROEM의 VMD 전문가입니다.\n\n매장: "+storeName+"\n구역: "+zoneName+"\n\n아래 [평가 기준]에 따라 업로드된 사진을 평가해 주세요.\n각 항목별로 점수(0점 또는 만점)를 부여하고 이유를 간단히 설명해 주세요.\n마지막에 총점과 등급(A:100~91점, B:90~81점, C:80~71점, D:70~61점, E:60~51점, F:50~0점)을 표시해 주세요.\n\n[평가 기준]\n"+criteriaText+"\n\n결과 형식:\n각 항목: No.번호 - 점수/만점 - 한줄 평가\n총점: XX점 | 등급: X등급"});
   userContent.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:photo.split(",")[1]}});
   if(refImgs.length>0){
-    userContent.push({type:"text",text:"\n[기준 사진 "+(refImgs.length)+"장]"});
     refImgs.slice(0,3).forEach(function(img){
       userContent.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:img.split(",")[1]}});
     });
-  } else {
-    userContent.push({type:"text",text:"\n(기준 사진 없음 - VMD 전문가로서 일반적인 기준으로 평가해 주세요)"});
   }
 
   fetch("https://2026.leejuyeon337.workers.dev/",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      model:"claude-opus-4-5",
-      max_tokens:1000,
-      messages:[{role:"user",content:userContent}]
-    })
+    body:JSON.stringify({model:"claude-opus-4-5",max_tokens:1000,messages:[{role:"user",content:userContent}]})
   })
   .then(function(r){return r.json();})
   .then(function(data){
-    var resultText="";
-    if(data.content&&data.content[0]&&data.content[0].text){
-      resultText=data.content[0].text;
-    } else {
-      resultText="AI 평가 오류: "+JSON.stringify(data).slice(0,100);
-    }
+    var result=data.content&&data.content[0]?data.content[0].text:"평가 실패";
     var now2=new Date();
     var tm2=(now2.getMonth()+1)+"/"+now2.getDate()+" "+String(now2.getHours()).padStart(2,"0")+":"+String(now2.getMinutes()).padStart(2,"0");
-    // 로딩 메시지 삭제 후 결과 등록
-    if(loadingKey) db.ref("core/"+sid+"/"+zi+"/fb/"+loadingKey).remove();
-    db.ref("core/"+sid+"/"+zi+"/fb").push({text:"🤖 AI 평가: "+resultText,time:tm2,isA:true});
+    if(loadingKey)db.ref("core/"+sid+"/"+zi+"/fb/"+loadingKey).remove();
+    db.ref("core/"+sid+"/"+zi+"/fb").push({text:"🤖 AI 평가:\n"+result,time:tm2,isA:true});
   })
   .catch(function(e){
-    if(loadingKey) db.ref("core/"+sid+"/"+zi+"/fb/"+loadingKey).remove();
+    if(loadingKey)db.ref("core/"+sid+"/"+zi+"/fb/"+loadingKey).remove();
     var now2=new Date();
     var tm2=(now2.getMonth()+1)+"/"+now2.getDate()+" "+String(now2.getHours()).padStart(2,"0")+":"+String(now2.getMinutes()).padStart(2,"0");
     db.ref("core/"+sid+"/"+zi+"/fb").push({text:"AI 평가 실패: "+e.message,time:tm2,isA:true});
   });
 }
+
 function rmZPh(sid,zi){CD[sid][zi].photo=null;sCore(sid,zi);rZC();rCore();}
 function sFb(sid,zi){var inp=document.getElementById("cfi_"+sid+"_"+zi);var t=inp?inp.value.trim():"";if(!t)return;var now=new Date();var tm=(now.getMonth()+1)+"/"+now.getDate()+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");db.ref("core/"+sid+"/"+zi+"/fb").push({text:t,time:tm,isA:isA});inp.value="";}
 function dFb(sid,zi,fid){db.ref("core/"+sid+"/"+zi+"/fb/"+fid).remove();}
