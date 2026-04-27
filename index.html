@@ -545,7 +545,68 @@ function openClp(sid){if(actS===sid){closeClp();return;}actS=sid;opZ={};document
 function closeClp(){actS=null;document.getElementById("clp").classList.remove("on");document.querySelectorAll(".sr").forEach(function(r){r.classList.remove("on");});}
 function tZ(zi){opZ[zi]=!opZ[zi];rZC();}
 function tChk(sid,zi){CD[sid][zi].checked=!CD[sid][zi].checked;sCore(sid,zi);rZC();rCore();}
-function upZPh(sid,zi){pick(function(f){comp(f,600,0.65,function(c){CD[sid][zi].photo=c;CD[sid][zi].checked=true;sCore(sid,zi);rZC();rCore();});});}
+function upZPh(sid,zi){pick(function(f){comp(f,600,0.65,function(c){CD[sid][zi].photo=c;CD[sid][zi].checked=true;sCore(sid,zi);rZC();rCore();aiEval(sid,zi,c);});});}
+
+function aiEval(sid,zi,photo){
+  // 기준 사진 수집: 진열맵 + 구현맵 핀 사진
+  var refImgs=[];
+  // 진열맵 사진
+  Object.values(mapZones).forEach(function(z){if(z.photo)refImgs.push(z.photo);});
+  // 구현맵 핀 사진
+  Object.values(iPins).forEach(function(p){if(p.photo)refImgs.push(p.photo);});
+
+  var zoneName=CZ[zi];
+  var storeName=SS.find(function(s){return s.id===sid;}).n;
+
+  // 피드백에 "AI 평가 중..." 표시
+  var now=new Date();
+  var tm=(now.getMonth()+1)+"/"+now.getDate()+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+  var loadingKey=null;
+  db.ref("core/"+sid+"/"+zi+"/fb").push({text:"AI 평가 중...",time:tm,isA:true,aiLoading:true}).then(function(ref){loadingKey=ref.key;});
+
+  // 메시지 구성
+  var userContent=[];
+  userContent.push({type:"text",text:"당신은 패션 브랜드 ROEM의 VMD(비주얼 머천다이징) 전문가입니다.\n\n[평가 대상]\n매장: "+storeName+"\n구역: "+zoneName+"\n\n아래 업로드된 사진이 기준 사진(진열맵/모델매장 구현맵)과 비교했을 때 VMD가 잘 되었는지 평가해 주세요.\n\n평가 항목:\n1. 진열 구성이 기준과 유사한지\n2. 상품 배치와 연출이 적절한지\n3. 개선이 필요한 부분\n\n3~5문장으로 간결하게 한국어로 답변해 주세요."});
+  userContent.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:photo.split(",")[1]}});
+  if(refImgs.length>0){
+    userContent.push({type:"text",text:"\n[기준 사진 "+(refImgs.length)+"장]"});
+    refImgs.slice(0,3).forEach(function(img){
+      userContent.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:img.split(",")[1]}});
+    });
+  } else {
+    userContent.push({type:"text",text:"\n(기준 사진 없음 - VMD 전문가로서 일반적인 기준으로 평가해 주세요)"});
+  }
+
+  fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:"claude-sonnet-4-20250514",
+      max_tokens:1000,
+      messages:[{role:"user",content:userContent}]
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    var resultText="";
+    if(data.content&&data.content[0]&&data.content[0].text){
+      resultText=data.content[0].text;
+    } else {
+      resultText="AI 평가 오류: "+JSON.stringify(data).slice(0,100);
+    }
+    var now2=new Date();
+    var tm2=(now2.getMonth()+1)+"/"+now2.getDate()+" "+String(now2.getHours()).padStart(2,"0")+":"+String(now2.getMinutes()).padStart(2,"0");
+    // 로딩 메시지 삭제 후 결과 등록
+    if(loadingKey) db.ref("core/"+sid+"/"+zi+"/fb/"+loadingKey).remove();
+    db.ref("core/"+sid+"/"+zi+"/fb").push({text:"🤖 AI 평가: "+resultText,time:tm2,isA:true});
+  })
+  .catch(function(e){
+    if(loadingKey) db.ref("core/"+sid+"/"+zi+"/fb/"+loadingKey).remove();
+    var now2=new Date();
+    var tm2=(now2.getMonth()+1)+"/"+now2.getDate()+" "+String(now2.getHours()).padStart(2,"0")+":"+String(now2.getMinutes()).padStart(2,"0");
+    db.ref("core/"+sid+"/"+zi+"/fb").push({text:"AI 평가 실패: "+e.message,time:tm2,isA:true});
+  });
+}
 function rmZPh(sid,zi){CD[sid][zi].photo=null;sCore(sid,zi);rZC();rCore();}
 function sFb(sid,zi){var inp=document.getElementById("cfi_"+sid+"_"+zi);var t=inp?inp.value.trim():"";if(!t)return;var now=new Date();var tm=(now.getMonth()+1)+"/"+now.getDate()+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");db.ref("core/"+sid+"/"+zi+"/fb").push({text:t,time:tm,isA:isA});inp.value="";}
 function dFb(sid,zi,fid){db.ref("core/"+sid+"/"+zi+"/fb/"+fid).remove();}
