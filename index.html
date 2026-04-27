@@ -417,7 +417,12 @@ function rMap() {
         var item=el("div","fi3");
         var fbt=el("div","ft2");
         if(f.isA){var tag=el("span","at");tag.textContent="관리자";fbt.appendChild(tag);}
-        fbt.appendChild(txt(f.text));
+        // AI 평가 결과: 관리자는 상세, 유저는 요약
+        if(f.isAiResult && f.detail && isA){
+          fbt.appendChild(txt(f.detail));
+        } else {
+          fbt.appendChild(txt(f.text));
+        }
         var ftm=el("div","ftm2");ftm.textContent=f.time;fbt.appendChild(ftm);
         item.appendChild(fbt);
         if(isA){var fd=el("span","fd2");fd.textContent="x";(function(z,fi){fd.onclick=function(){dMFb(z,fi);};})(zid,fid);item.appendChild(fd);}
@@ -585,7 +590,7 @@ function aiEval(sid,zi,photo){
   Object.values(iPins).forEach(function(p){if(p.photo)refImgs.push(p.photo);});
 
   var userContent=[];
-  userContent.push({type:"text",text:"당신은 패션 브랜드 ROEM의 VMD 전문가입니다.\n\n매장: "+storeName+"\n구역: "+zoneName+"\n\n아래 [평가 기준]에 따라 사진을 평가하세요.\n각 항목을 한 줄로 간결하게 평가하고 점수를 매겨주세요.\n마지막 줄에 반드시 정확히 이 형식으로 작성하세요: 총점: XX/"+maxScore+"점\n\n[평가 기준]\n"+criteriaText+"\n\n[출력 형식 예시]\nNo.1 - 10/10 - 전마 풀코디 착장 완료\nNo.2 - 8/10 - 사양 일부 불일치\n총점: 18/20점"});
+  userContent.push({type:"text",text:"당신은 패션 브랜드 ROEM의 VMD 전문가입니다.\n\n매장: "+storeName+"\n구역: "+zoneName+"\n\n[평가 기준]\n"+criteriaText+"\n\n위 기준으로 사진을 평가하세요.\n\n반드시 아래 형식으로만 출력하세요:\n---상세---\nNo.번호 - 점수/만점 - 한줄평가\n(항목 수만큼 반복)\n총점: XX/"+maxScore+"점\n---요약---\n한 문장으로 핵심만 (예: 마네킹 착장 양호, POP 미설치 개선 필요)"});
   userContent.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:photo.split(",")[1]}});
   if(refImgs.length>0){
     refImgs.slice(0,3).forEach(function(img){
@@ -596,7 +601,7 @@ function aiEval(sid,zi,photo){
   fetch("https://2026.leejuyeon337.workers.dev/",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:"claude-opus-4-5",max_tokens:500,messages:[{role:"user",content:userContent}]})
+    body:JSON.stringify({model:"claude-opus-4-5",max_tokens:600,messages:[{role:"user",content:userContent}]})
   })
   .then(function(r){return r.json();})
   .then(function(data){
@@ -604,12 +609,26 @@ function aiEval(sid,zi,photo){
     var now2=new Date();
     var tm2=(now2.getMonth()+1)+"/"+now2.getDate()+" "+String(now2.getHours()).padStart(2,"0")+":"+String(now2.getMinutes()).padStart(2,"0");
     if(loadingKey)db.ref("core/"+sid+"/"+zi+"/fb/"+loadingKey).remove();
-    // 점수 파싱해서 Firebase에 저장
-    var scoreMatch=result.match(/총점[:\s]*([0-9]+)/);
+
+    // 상세/요약 파싱
+    var detailMatch=result.match(/---상세---([\s\S]*?)---요약---/);
+    var summaryMatch=result.match(/---요약---([\s\S]*?)$/);
+    var detail=detailMatch?detailMatch[1].trim():result;
+    var summary=summaryMatch?summaryMatch[1].trim():result;
+
+    // 점수 파싱
+    var scoreMatch=detail.match(/총점[:\s]*([0-9]+)/);
     var score=scoreMatch?parseInt(scoreMatch[1]):null;
     db.ref("core/"+sid+"/"+zi+"/aiScore").set(score);
-    db.ref("core/"+sid+"/"+zi+"/fb").push({text:"🤖 AI 평가:\n"+result,time:tm2,isA:true});
-    // 4개 구역 모두 평가됐는지 확인
+
+    // Firebase에 상세/요약 분리 저장
+    db.ref("core/"+sid+"/"+zi+"/fb").push({
+      text:summary,           // 유저용 요약
+      detail:"🤖 AI 평가 상세:\n"+detail,  // 관리자용 상세
+      time:tm2,
+      isA:true,
+      isAiResult:true
+    });
     checkTotalScore(sid);
   })
   .catch(function(e){
@@ -621,7 +640,6 @@ function aiEval(sid,zi,photo){
 }
 
 function checkTotalScore(sid){
-  // 4개 구역 AI 점수 모두 있으면 총점 계산
   var refs=CZ.map(function(_,i){return db.ref("core/"+sid+"/"+i+"/aiScore").once("value");});
   Promise.all(refs).then(function(snaps){
     var scores=snaps.map(function(s){return s.val();});
@@ -632,11 +650,14 @@ function checkTotalScore(sid){
     var storeName=SS.find(function(s){return s.id===sid;}).n;
     var now=new Date();
     var tm=(now.getMonth()+1)+"/"+now.getDate()+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
-    // 총점을 첫 번째 구역(VP) 피드백에 등록
+    var summaryText="🏆 최종: "+total+"/100점 · "+grade;
+    var detailText="🏆 "+storeName+" 최종 평가\n총점: "+total+"/100점 | "+grade+"\nVP: "+scores[0]+"점 / VP메인바닥집기: "+scores[1]+"점 / WIN: "+scores[2]+"점 / 메인FACE: "+scores[3]+"점";
     db.ref("core/"+sid+"/0/fb").push({
-      text:"🏆 "+storeName+" 최종 평가\n총점: "+total+"/100점 | "+grade+"\n(VP: "+scores[0]+"점 / VP메인바닥집기: "+scores[1]+"점 / WIN: "+scores[2]+"점 / 메인FACE: "+scores[3]+"점)",
+      text:summaryText,
+      detail:detailText,
       time:tm,
       isA:true,
+      isAiResult:true,
       isFinal:true
     });
   });
