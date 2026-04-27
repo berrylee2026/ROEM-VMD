@@ -84,6 +84,9 @@ textarea:disabled{opacity:0.4}
 .ppr{display:flex;align-items:center;gap:8px;padding:0 10px 10px}
 .ppt{width:64px;height:64px;border-radius:8px;object-fit:cover;cursor:pointer;border:0.5px solid #e8e5e0}
 .ppd{font-size:11px;color:#ccc;cursor:pointer;margin-top:3px}
+.pmove{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
+.pmove-btn{font-size:10px;width:20px;height:18px;border-radius:4px;border:0.5px solid #ddd;background:#f8f7f5;color:#888;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.pmove-btn:hover{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489}
 .sl{display:flex;flex-direction:column;gap:7px}
 .sr{background:#fff;border:0.5px solid #e8e5e0;border-radius:12px;padding:13px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
 .sr.on{border:1.5px solid #534AB7}
@@ -497,6 +500,13 @@ function rImpl() {
       (function(pid){pni.onchange=function(){uPinL(pid,this.value);};})(pid);
       ph2.appendChild(pn); ph2.appendChild(pni);
       if(isA){
+        // 위아래 이동 버튼
+        var pmove=el("div","pmove");
+        var pup=el("button","pmove-btn");pup.textContent="▲";
+        (function(pid,i){pup.onclick=function(){movePin(pid,-1);};pup.disabled=(i===0);})(pid,i);
+        var pdn=el("button","pmove-btn");pdn.textContent="▼";
+        (function(pid,i,pids){pdn.onclick=function(){movePin(pid,1);};pdn.disabled=(i===pids.length-1);})(pid,i,pids);
+        pmove.appendChild(pup);pmove.appendChild(pdn);ph2.appendChild(pmove);
         var pa=el("div","pa");
         var pb=el("span","pbt"); pb.textContent="사진"; (function(pid){pb.onclick=function(){uPinPh(pid);};})(pid);
         var pd=el("span","pdt"); pd.textContent="x"; (function(pid){pd.onclick=function(){dPin(pid);};})(pid);
