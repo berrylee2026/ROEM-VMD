@@ -946,9 +946,9 @@ function rZC(){
 
   CZ.forEach(function(z,i){
     var d=CD[sid][i],isO=opZ[i];
-    var zc=el("div","zc"+(d.checked?" done":""));
+    var zc=el("div","zc"+((d.checked&&d.photo)?" done":""));
     var zh=el("div","zh");
-    var zck=el("div","zck");zck.textContent=d.checked?"✓":"";
+    var zck=el("div","zck");zck.textContent=(d.checked&&d.photo)?"✓":"";
     (function(sid,i){zck.onclick=function(e){e.stopPropagation();tChk(sid,i);};})(sid,i);
     var zn=el("div","zn");zn.textContent=z;
     var za=el("div","za"+(isO?" on":""));za.textContent="›";
