@@ -160,6 +160,20 @@ textarea:disabled{opacity:0.4}
 .criteria-label{font-size:11px;color:#534AB7;font-weight:500}
 .criteria-input{width:100%;background:#fff;border:0.5px solid #AFA9EC;border-radius:7px;padding:6px 10px;font-size:12px;color:#1a1a1a;font-family:inherit;outline:none;resize:none}
 .criteria-save-btn{font-size:11px;padding:6px 14px;border-radius:8px;border:0.5px solid #AFA9EC;background:#534AB7;color:#fff;cursor:pointer;margin-top:4px}
+.floor-plan-section{background:#f8f7f5;border:0.5px solid #e8e5e0;border-radius:10px;padding:12px;margin-top:8px}
+.floor-plan-title{font-size:11px;font-weight:700;color:#aaa;letter-spacing:0.04em;margin-bottom:8px}
+.floor-plan-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.floor-plan-thumb{width:70px;height:70px;border-radius:8px;object-fit:cover;cursor:pointer;border:0.5px solid #e8e5e0;flex-shrink:0}
+.floor-plan-empty{width:70px;height:70px;border-radius:8px;border:1px dashed #ddd;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:#ccc;cursor:pointer;flex-shrink:0;text-align:center;padding:4px}
+.floor-plan-info{flex:1;font-size:11px;color:#aaa}
+.floor-plan-info.ok{color:#3B6D11}
+.floor-plan-del{font-size:11px;color:#ccc;cursor:pointer;margin-top:2px}
+.elev-list{display:flex;flex-direction:column;gap:6px}
+.elev-item{display:flex;align-items:center;gap:8px}
+.elev-name{font-size:11px;color:#1a1a1a;flex:1}
+.add-elev-bar{display:flex;gap:6px;margin-top:6px}
+.add-elev-input{flex:1;background:#fff;border:0.5px solid #e8e5e0;border-radius:7px;padding:6px 8px;font-size:11px;font-family:inherit;outline:none}
+.add-elev-btn{font-size:10px;padding:6px 10px;border-radius:7px;border:0.5px solid #AFA9EC;background:#EEEDFE;color:#3C3489;cursor:pointer;white-space:nowrap}
 .add-photo-bar{display:flex;gap:6px;align-items:center;margin-top:8px;padding-top:8px;border-top:0.5px dashed #e8e5e0}
 .add-photo-input{flex:1;background:#f8f7f5;border:0.5px solid #e8e5e0;border-radius:8px;padding:7px 10px;font-size:12px;color:#1a1a1a;font-family:inherit;outline:none}
 .add-photo-btn{font-size:11px;padding:7px 12px;border-radius:8px;border:0.5px solid #AFA9EC;background:#EEEDFE;color:#3C3489;cursor:pointer;white-space:nowrap}
@@ -656,7 +670,7 @@ function goTab(i){document.querySelectorAll(".tab").forEach(function(t,j){t.clas
 function goSt(i){document.querySelectorAll(".st").forEach(function(t,j){t.classList.toggle("on",i===j);});document.querySelectorAll(".sp").forEach(function(p,j){p.classList.toggle("on",i===j);});}
 
 // ── 핵심매장 ──
-function getDone(sid){return CD[sid].filter(function(d){return d.checked;}).length;}
+function getDone(sid){return CD[sid].filter(function(d){return d.checked&&d.photo;}).length;}
 function openClp(sid){if(actS===sid){closeClp();return;}actS=sid;opZ={};document.getElementById("clt").textContent=SS.find(function(s){return s.id===sid;}).n;rZC();document.getElementById("clp").classList.add("on");document.querySelectorAll(".sr").forEach(function(r){r.classList.remove("on");});document.querySelector(".sr[data-id='"+sid+"']").classList.add("on");setTimeout(function(){document.getElementById("clp").scrollIntoView({behavior:"smooth",block:"nearest"});},50);}
 function saveStoreCriteria(sid){
   var data = {};
@@ -664,8 +678,42 @@ function saveStoreCriteria(sid){
     var inp = document.getElementById("crit_"+sid+"_"+z.replace(/ /g,"_"));
     if(inp) data[z] = inp.value.trim();
   });
+  // 기존 도면 데이터 유지
+  var existing = storeCriteria[sid] || {};
+  if(existing.floorPlan) data.floorPlan = existing.floorPlan;
+  if(existing.elevations) data.elevations = existing.elevations;
   db.ref("storeCriteria/"+sid).set(data);
   alert("기준이 저장되었어요!");
+}
+
+function uploadFloorPlan(sid){
+  if(!isA)return;
+  pick(function(f){
+    comp(f,800,0.75,function(c){
+      db.ref("storeCriteria/"+sid+"/floorPlan").set(c);
+    });
+  });
+}
+function delFloorPlan(sid){
+  if(!isA||!confirm("평면도를 삭제할까요?"))return;
+  db.ref("storeCriteria/"+sid+"/floorPlan").set(null);
+}
+function uploadElevation(sid){
+  if(!isA)return;
+  var inp=document.getElementById("elev-name-"+sid);
+  var name=inp?inp.value.trim():"";
+  if(!name){alert("입면도 이름을 입력해 주세요 (예: VP 입면도)");return;}
+  pick(function(f){
+    comp(f,800,0.75,function(c){
+      var key="elev_"+Date.now();
+      db.ref("storeCriteria/"+sid+"/elevations/"+key).set({name:name,photo:c});
+      if(inp)inp.value="";
+    });
+  });
+}
+function delElevation(sid,key){
+  if(!isA||!confirm("입면도를 삭제할까요?"))return;
+  db.ref("storeCriteria/"+sid+"/elevations/"+key).remove();
 }
 
 function addExtraPhoto(sid){
@@ -727,11 +775,18 @@ function aiEval(sid,zi,photo){
   var maxScore=zoneItems.reduce(function(a,c){return a+c.score;},0);
 
   var refImgs=[];
+  // 해당 매장 도면 우선 참고
+  var storeCrit=storeCriteria[sid]||{};
+  if(storeCrit.floorPlan) refImgs.push(storeCrit.floorPlan);
+  if(storeCrit.elevations){
+    Object.values(storeCrit.elevations).forEach(function(e){if(e.photo)refImgs.push(e.photo);});
+  }
+  // 진열맵/구현맵 사진
   Object.values(mapZones).forEach(function(z){if(z.photo)refImgs.push(z.photo);});
   Object.values(iPins).forEach(function(p){if(p.photo)refImgs.push(p.photo);});
 
   var userContent=[];
-  userContent.push({type:"text",text:"당신은 패션 브랜드 ROEM의 VMD 전문가입니다.\n\n매장: "+storeName+"\n구역: "+zoneName+customText+"\n\n[평가 기준]\n"+criteriaText+"\n\n위 기준으로 사진을 평가하세요. 매장 특이사항이 있다면 해당 매장 기준에 맞게 평가하세요.\n\n반드시 아래 형식으로만 출력하세요:\n---상세---\nNo.번호 - 점수/만점 - 한줄평가\n(항목 수만큼 반복)\n총점: XX/"+maxScore+"점\n---요약---\n한 문장으로 핵심만 (예: 마네킹 착장 양호, POP 미설치 개선 필요)"});
+  userContent.push({type:"text",text:"당신은 패션 브랜드 ROEM의 VMD 전문가입니다.\n\n매장: "+storeName+"\n구역: "+zoneName+customText+"\n\n[평가 기준]\n"+criteriaText+(refImgs.length>0?"\n\n[참고] 함께 제공된 이미지: 첫 번째는 매장 도면(평면도/입면도)이며, 이를 참고하여 해당 매장의 실제 사양(페이스 크기, 행어 간격 등)에 맞게 평가하세요.":"")+"\n\n위 기준으로 사진을 평가하세요. 매장 특이사항과 도면이 있다면 해당 매장 기준에 맞게 평가하세요.\n\n반드시 아래 형식으로만 출력하세요:\n---상세---\nNo.번호 - 점수/만점 - 한줄평가\n(항목 수만큼 반복)\n총점: XX/"+maxScore+"점\n---요약---\n한 문장으로 핵심만 (예: 마네킹 착장 양호, POP 미설치 개선 필요)"});
   userContent.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:photo.split(",")[1]}});
   if(refImgs.length>0){
     refImgs.slice(0,3).forEach(function(img){
@@ -804,7 +859,7 @@ function checkTotalScore(sid){
   });
 }
 
-function rmZPh(sid,zi){CD[sid][zi].photo=null;sCore(sid,zi);rZC();rCore();}
+function rmZPh(sid,zi){CD[sid][zi].photo=null;CD[sid][zi].checked=false;sCore(sid,zi);rZC();rCore();}
 function sFb(sid,zi){var inp=document.getElementById("cfi_"+sid+"_"+zi);var t=inp?inp.value.trim():"";if(!t)return;var now=new Date();var tm=(now.getMonth()+1)+"/"+now.getDate()+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");db.ref("core/"+sid+"/"+zi+"/fb").push({text:t,time:tm,isA:isA});inp.value="";}
 function dFb(sid,zi,fid){db.ref("core/"+sid+"/"+zi+"/fb/"+fid).remove();}
 function rZC(){
@@ -831,6 +886,61 @@ function rZC(){
     saveBtn.textContent="기준 저장";
     (function(sid){saveBtn.onclick=function(){saveStoreCriteria(sid);};})(sid);
     critBox.appendChild(saveBtn);
+
+    // 도면 섹션
+    var floorSection=el("div","floor-plan-section");
+    var floorTitle=el("div","floor-plan-title");floorTitle.textContent="🗺️ 매장 도면";
+    floorSection.appendChild(floorTitle);
+
+    // 평면도
+    var fpLabel=el("div");fpLabel.style.cssText="font-size:11px;color:#534AB7;font-weight:500;margin-bottom:4px";fpLabel.textContent="평면도";
+    floorSection.appendChild(fpLabel);
+    var fpRow=el("div","floor-plan-row");
+    var fp=savedCrit.floorPlan||null;
+    if(fp){
+      var fpThumb=el("img","floor-plan-thumb");fpThumb.src=fp;
+      var fpSrc=fp;fpThumb.onclick=function(){openLb("평면도",fpSrc);};
+      var fpInfo=el("div");
+      var fpOk=el("div","floor-plan-info ok");fpOk.textContent="평면도 등록됨";
+      var fpDel=el("div","floor-plan-del");fpDel.textContent="× 삭제";
+      (function(sid){fpDel.onclick=function(){delFloorPlan(sid);};})(sid);
+      fpInfo.appendChild(fpOk);fpInfo.appendChild(fpDel);
+      fpRow.appendChild(fpThumb);fpRow.appendChild(fpInfo);
+    } else {
+      var fpEmpty=el("div","floor-plan-empty");
+      fpEmpty.innerHTML="📐<br>평면도 업로드";
+      (function(sid){fpEmpty.onclick=function(){uploadFloorPlan(sid);};})(sid);
+      var fpInfo2=el("div","floor-plan-info");fpInfo2.textContent="탭하여 업로드";
+      fpRow.appendChild(fpEmpty);fpRow.appendChild(fpInfo2);
+    }
+    floorSection.appendChild(fpRow);
+
+    // 입면도
+    var elLabel=el("div");elLabel.style.cssText="font-size:11px;color:#534AB7;font-weight:500;margin:8px 0 4px";elLabel.textContent="입면도";
+    floorSection.appendChild(elLabel);
+    var elevList=el("div","elev-list");
+    var elevs=savedCrit.elevations||{};
+    Object.entries(elevs).forEach(function(en){
+      var key=en[0],ev=en[1];
+      var eRow=el("div","elev-item");
+      var eThumb=el("img","floor-plan-thumb");eThumb.src=ev.photo;
+      var eSrc=ev.photo,eName=ev.name;eThumb.onclick=function(){openLb(eName,eSrc);};
+      var eInfo=el("div");
+      var eName2=el("div","elev-name");eName2.textContent=ev.name;
+      var eDel=el("div","floor-plan-del");eDel.textContent="× 삭제";
+      (function(sid,key){eDel.onclick=function(){delElevation(sid,key);};})(sid,key);
+      eInfo.appendChild(eName2);eInfo.appendChild(eDel);
+      eRow.appendChild(eThumb);eRow.appendChild(eInfo);
+      elevList.appendChild(eRow);
+    });
+    floorSection.appendChild(elevList);
+    var addElevBar=el("div","add-elev-bar");
+    var addElevInp=el("input","add-elev-input");addElevInp.id="elev-name-"+sid;addElevInp.placeholder="입면도 이름 (예: VP 입면도, WIN 입면도)";
+    var addElevBtn=el("button","add-elev-btn");addElevBtn.textContent="+ 입면도 추가";
+    (function(sid){addElevBtn.onclick=function(){uploadElevation(sid);};})(sid);
+    addElevBar.appendChild(addElevInp);addElevBar.appendChild(addElevBtn);
+    floorSection.appendChild(addElevBar);
+    critBox.appendChild(floorSection);
     zcs.appendChild(critBox);
   }
 
