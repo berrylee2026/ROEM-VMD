@@ -154,6 +154,34 @@ textarea:disabled{opacity:0.4}
 .ft2{flex:1;line-height:1.5}.ftm2{font-size:10px;color:#aaa;margin-top:1px}
 .fd2{font-size:12px;color:#ccc;cursor:pointer;flex-shrink:0}
 .nf{font-size:11px;color:#ccc;font-style:italic}
+.mq-card{background:#fff;border-radius:14px;overflow:hidden;border:0.5px solid #e8e5e0;margin-bottom:12px}
+.mq-photo-wrap{width:100%;height:240px;background:#f0ede8;overflow:hidden;cursor:zoom-in;position:relative}
+.mq-photo-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.mq-photo-empty{width:100%;height:240px;background:#f8f7f5;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border-bottom:0.5px solid #e8e5e0}
+.mq-photo-empty .phico{font-size:28px;margin-bottom:6px;color:#ccc}
+.mq-photo-empty .phtxt{font-size:12px;color:#ccc}
+.mq-body{padding:14px}
+.mq-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.mq-store{font-size:11px;color:#534AB7;font-weight:600;background:#EEEDFE;padding:2px 8px;border-radius:10px}
+.mq-date{font-size:11px;color:#aaa}
+.mq-concept-label{font-size:11px;color:#aaa;margin-bottom:4px}
+.mq-concept{font-size:13px;color:#1a1a1a;line-height:1.6;margin-bottom:10px}
+.mq-code-label{font-size:11px;color:#aaa;margin-bottom:4px}
+.mq-code{font-size:12px;color:#534AB7;background:#f8f7f5;border-radius:7px;padding:6px 10px;line-height:1.6}
+.mq-actions{display:flex;gap:6px;margin-top:10px}
+.mq-edit-btn{font-size:10px;padding:4px 10px;border-radius:6px;border:0.5px solid #AFA9EC;background:#EEEDFE;color:#3C3489;cursor:pointer}
+.mq-del-btn{font-size:10px;padding:4px 10px;border-radius:6px;border:0.5px solid #F0997B;background:#FAECE7;color:#993C1D;cursor:pointer}
+.mq-add-card{background:#fff;border-radius:14px;border:1px dashed #AFA9EC;padding:16px;margin-bottom:16px}
+.mq-add-title{font-size:13px;font-weight:600;color:#534AB7;margin-bottom:12px}
+.mq-add-photo{width:100%;height:180px;border-radius:10px;border:1px dashed #ddd;background:#f8f7f5;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;margin-bottom:12px;overflow:hidden}
+.mq-add-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.mq-add-photo .phico{font-size:28px;margin-bottom:6px;color:#ccc}
+.mq-add-photo .phtxt{font-size:12px;color:#ccc}
+.mq-field{margin-bottom:10px}
+.mq-field-label{font-size:11px;color:#aaa;margin-bottom:4px}
+.mq-field textarea{width:100%;background:#f8f7f5;border:0.5px solid #e8e5e0;border-radius:8px;padding:8px 10px;font-size:13px;color:#1a1a1a;font-family:inherit;outline:none;resize:none;line-height:1.6}
+.mq-submit-btn{width:100%;padding:12px;border-radius:10px;border:none;background:#534AB7;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.mq-submit-btn:active{opacity:0.85}
 .best-header{text-align:center;padding:20px 0 16px}
 .best-week{font-size:12px;color:#aaa;margin-bottom:4px}
 .best-title{font-size:18px;font-weight:700;color:#1a1a1a}
@@ -257,6 +285,7 @@ textarea:disabled{opacity:0.4}
   <div class="tab" onclick="goTab(1)">📊 핵심매장</div>
   <div class="tab" onclick="goTab(2)">📐 진열 맵</div>
   <div class="tab" onclick="goTab(3)">🏆 우수매장</div>
+  <div class="tab" onclick="goTab(4)">👗 MQ착장</div>
 </div>
 <div id="pg0" class="pg on">
   <div class="sbar"><span class="sd" id="sd0"></span><span id="sl0">연결 중...</span></div>
@@ -299,6 +328,11 @@ textarea:disabled{opacity:0.4}
 <div id="pg3" class="pg">
   <div class="sbar"><span class="sd" id="sd3"></span><span id="sl3">연결 중...</span></div>
   <div id="best-stores"></div>
+</div>
+<div id="pg4" class="pg">
+  <div class="sbar"><span class="sd" id="sd4"></span><span id="sl4">연결 중...</span></div>
+  <div id="mq-add-bar"></div>
+  <div id="mq-list"></div>
 </div>
 <div class="ov" id="ov">
   <div class="modal">
@@ -691,6 +725,7 @@ function goTab(i){
   document.querySelectorAll(".tab").forEach(function(t,j){t.classList.toggle("on",i===j);});
   document.querySelectorAll(".pg").forEach(function(p,j){p.classList.toggle("on",i===j);});
   if(i===3) rBestStores();
+  if(i===4) rMqList();
 }
 function goSt(i){document.querySelectorAll(".st").forEach(function(t,j){t.classList.toggle("on",i===j);});document.querySelectorAll(".sp").forEach(function(p,j){p.classList.toggle("on",i===j);});}
 
@@ -1028,6 +1063,157 @@ function rZC(){
   addBar.appendChild(addInp);addBar.appendChild(addBtn);
   zcs.appendChild(addBar);
 }
+// ── MQ 착장 ──
+var mqData = {}; // Firebase에서 실시간 수신
+var mqDraft = {photo: null}; // 작성 중인 카드
+
+db.ref("mqPosts").on("value", function(s){
+  mqData = s.val() || {};
+  if(document.getElementById("pg4").classList.contains("on")) rMqList();
+});
+
+function rMqList(){
+  var addBar = document.getElementById("mq-add-bar");
+  var listEl = document.getElementById("mq-list");
+  if(!addBar || !listEl) return;
+
+  // 작성 카드 (모든 유저 가능)
+  addBar.innerHTML = "";
+  var addCard = el("div","mq-add-card");
+  var addTitle = el("div","mq-add-title"); addTitle.textContent = "✏️ MQ 착장 제안 등록";
+  addCard.appendChild(addTitle);
+
+  // 사진 업로드
+  var photoBox = el("div","mq-add-photo");
+  photoBox.id = "mq-draft-photo-box";
+  if(mqDraft.photo){
+    var draftImg = el("img"); draftImg.src = mqDraft.photo;
+    photoBox.appendChild(draftImg);
+  } else {
+    var dIco = el("div"); dIco.className="phico"; dIco.textContent="📷";
+    var dTxt = el("div"); dTxt.className="phtxt"; dTxt.textContent="사진 탭하여 업로드";
+    photoBox.appendChild(dIco); photoBox.appendChild(dTxt);
+  }
+  photoBox.onclick = function(){
+    pick(function(f){
+      comp(f,800,0.8,function(c){
+        mqDraft.photo = c;
+        rMqList();
+      });
+    });
+  };
+  addCard.appendChild(photoBox);
+
+  // 착장 컨셉
+  var conceptField = el("div","mq-field");
+  var conceptLabel = el("div","mq-field-label"); conceptLabel.textContent="착장 컨셉";
+  var conceptTa = el("textarea"); conceptTa.id="mq-draft-concept"; conceptTa.rows=3; conceptTa.placeholder="착장 컨셉을 입력해 주세요 (예: 봄 로맨틱 레이어드 스타일링)";
+  conceptField.appendChild(conceptLabel); conceptField.appendChild(conceptTa);
+  addCard.appendChild(conceptField);
+
+  // 상품 코드
+  var codeField = el("div","mq-field");
+  var codeLabel = el("div","mq-field-label"); codeLabel.textContent="상품 코드";
+  var codeTa = el("textarea"); codeTa.id="mq-draft-code"; codeTa.rows=3; codeTa.placeholder="상품 코드를 입력해 주세요
+(예: RMJKG24R13 / RMHWG24R15 / RMTJG24G14)";
+  codeField.appendChild(codeLabel); codeField.appendChild(codeTa);
+  addCard.appendChild(codeField);
+
+  // 등록 버튼
+  var submitBtn = el("button","mq-submit-btn");
+  submitBtn.textContent = "등록하기";
+  submitBtn.onclick = submitMq;
+  addCard.appendChild(submitBtn);
+  addBar.appendChild(addCard);
+
+  // 게시물 목록
+  listEl.innerHTML = "";
+  var posts = Object.entries(mqData).sort(function(a,b){
+    return (b[1].createdAt||0)-(a[1].createdAt||0);
+  });
+
+  if(!posts.length){
+    var empty = el("div"); empty.style.cssText="text-align:center;padding:40px;font-size:13px;color:#aaa";
+    empty.textContent="아직 등록된 MQ 착장이 없어요";
+    listEl.appendChild(empty);
+    return;
+  }
+
+  posts.forEach(function(entry){
+    var kid=entry[0], post=entry[1];
+    var card = el("div","mq-card");
+
+    // 사진
+    if(post.photo){
+      var pw = el("div","mq-photo-wrap");
+      var img = el("img"); img.src=post.photo;
+      var ps=post.photo, pn=post.storeName||"MQ착장";
+      img.onclick=function(){openLb(pn,ps);};
+      pw.appendChild(img); card.appendChild(pw);
+    } else {
+      var pe = el("div","mq-photo-empty");
+      pe.innerHTML="<div class='phico'>📷</div><div class='phtxt'>사진 없음</div>";
+      card.appendChild(pe);
+    }
+
+    // 본문
+    var body = el("div","mq-body");
+    var meta = el("div","mq-meta");
+    var storeSpan = el("span","mq-store"); storeSpan.textContent=post.storeName||"매장 미상";
+    var dateSpan = el("span","mq-date"); dateSpan.textContent=post.date||"";
+    meta.appendChild(storeSpan); meta.appendChild(dateSpan);
+    body.appendChild(meta);
+
+    if(post.concept){
+      var cLabel=el("div","mq-concept-label");cLabel.textContent="착장 컨셉";
+      var cTxt=el("div","mq-concept");cTxt.textContent=post.concept;
+      body.appendChild(cLabel);body.appendChild(cTxt);
+    }
+    if(post.code){
+      var cdLabel=el("div","mq-code-label");cdLabel.textContent="상품 코드";
+      var cdTxt=el("div","mq-code");cdTxt.textContent=post.code;
+      body.appendChild(cdLabel);body.appendChild(cdTxt);
+    }
+
+    // 삭제 버튼 (관리자만)
+    if(isA){
+      var acts=el("div","mq-actions");
+      var delBtn=el("button","mq-del-btn");delBtn.textContent="삭제";
+      (function(kid){delBtn.onclick=function(){if(confirm("삭제할까요?"))db.ref("mqPosts/"+kid).remove();};})(kid);
+      acts.appendChild(delBtn);
+      body.appendChild(acts);
+    }
+    card.appendChild(body);
+    listEl.appendChild(card);
+  });
+}
+
+function submitMq(){
+  if(!mqDraft.photo){alert("사진을 먼저 업로드해 주세요!");return;}
+  var concept=document.getElementById("mq-draft-concept");
+  var code=document.getElementById("mq-draft-code");
+  var conceptVal=concept?concept.value.trim():"";
+  var codeVal=code?code.value.trim():"";
+  if(!conceptVal){alert("착장 컨셉을 입력해 주세요!");return;}
+
+  var now=new Date();
+  var date=(now.getMonth()+1)+"/"+now.getDate()+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+  // 매장명 추정 (actS 기준)
+  var storeName = actS ? SS.find(function(s){return s.id===actS;}).n : "익명";
+
+  db.ref("mqPosts").push({
+    photo: mqDraft.photo,
+    concept: conceptVal,
+    code: codeVal,
+    storeName: storeName,
+    date: date,
+    createdAt: Date.now()
+  }).then(function(){
+    mqDraft = {photo:null};
+    rMqList();
+  });
+}
+
 function getWeekStr(){
   var now=new Date();
   var startOfYear=new Date(now.getFullYear(),0,1);
