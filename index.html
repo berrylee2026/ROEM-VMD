@@ -154,6 +154,22 @@ textarea:disabled{opacity:0.4}
 .ft2{flex:1;line-height:1.5}.ftm2{font-size:10px;color:#aaa;margin-top:1px}
 .fd2{font-size:12px;color:#ccc;cursor:pointer;flex-shrink:0}
 .nf{font-size:11px;color:#ccc;font-style:italic}
+.best-header{text-align:center;padding:20px 0 16px}
+.best-week{font-size:12px;color:#aaa;margin-bottom:4px}
+.best-title{font-size:18px;font-weight:700;color:#1a1a1a}
+.best-card{background:#fff;border-radius:16px;overflow:hidden;border:0.5px solid #e8e5e0;margin-bottom:12px}
+.best-card.rank1{border:2px solid #FFD700}
+.best-card.rank2{border:2px solid #C0C0C0}
+.best-card.rank3{border:2px solid #CD7F32}
+.best-photo{width:100%;height:200px;object-fit:cover;display:block;background:#f0ede8;cursor:zoom-in}
+.best-photo-empty{width:100%;height:160px;background:#f8f7f5;display:flex;align-items:center;justify-content:center;font-size:13px;color:#ccc}
+.best-info{padding:14px 16px}
+.best-rank{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.best-trophy{font-size:24px}
+.best-rank-num{font-size:13px;font-weight:600;color:#aaa}
+.best-store-name{font-size:17px;font-weight:700;color:#1a1a1a}
+.best-score{font-size:13px;color:#534AB7;font-weight:600;margin-top:4px}
+.best-empty{text-align:center;padding:60px 20px;color:#aaa;font-size:13px}
 .store-criteria{background:#f0eeff;border:0.5px solid #AFA9EC;border-radius:10px;padding:12px;margin-bottom:10px}
 .criteria-title{font-size:11px;font-weight:700;color:#534AB7;letter-spacing:0.04em;margin-bottom:8px}
 .criteria-row{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
@@ -240,6 +256,7 @@ textarea:disabled{opacity:0.4}
   <div class="tab on" onclick="goTab(0)">🩷 모델매장</div>
   <div class="tab" onclick="goTab(1)">📊 핵심매장</div>
   <div class="tab" onclick="goTab(2)">📐 진열 맵</div>
+  <div class="tab" onclick="goTab(3)">🏆 우수매장</div>
 </div>
 <div id="pg0" class="pg on">
   <div class="sbar"><span class="sd" id="sd0"></span><span id="sl0">연결 중...</span></div>
@@ -278,6 +295,10 @@ textarea:disabled{opacity:0.4}
   <div id="lk2" class="lk"><span>🔒 읽기 전용</span><button onclick="openPin()">관리자 로그인</button></div>
   <div id="map-add-bar"></div>
   <div class="ml2" id="ml2"></div>
+</div>
+<div id="pg3" class="pg">
+  <div class="sbar"><span class="sd" id="sd3"></span><span id="sl3">연결 중...</span></div>
+  <div id="best-stores"></div>
 </div>
 <div class="ov" id="ov">
   <div class="modal">
@@ -666,7 +687,11 @@ function applyA(){
   ["ds","de","tm","tt","td"].forEach(function(id){var e=document.getElementById(id);if(e)e.disabled=!isA;});
   rImpl(); rMap(); if(actS)rZC();
 }
-function goTab(i){document.querySelectorAll(".tab").forEach(function(t,j){t.classList.toggle("on",i===j);});document.querySelectorAll(".pg").forEach(function(p,j){p.classList.toggle("on",i===j);});}
+function goTab(i){
+  document.querySelectorAll(".tab").forEach(function(t,j){t.classList.toggle("on",i===j);});
+  document.querySelectorAll(".pg").forEach(function(p,j){p.classList.toggle("on",i===j);});
+  if(i===3) rBestStores();
+}
 function goSt(i){document.querySelectorAll(".st").forEach(function(t,j){t.classList.toggle("on",i===j);});document.querySelectorAll(".sp").forEach(function(p,j){p.classList.toggle("on",i===j);});}
 
 // ── 핵심매장 ──
@@ -1003,6 +1028,79 @@ function rZC(){
   addBar.appendChild(addInp);addBar.appendChild(addBtn);
   zcs.appendChild(addBar);
 }
+function getWeekStr(){
+  var now=new Date();
+  var startOfYear=new Date(now.getFullYear(),0,1);
+  var week=Math.ceil(((now-startOfYear)/86400000+startOfYear.getDay()+1)/7);
+  return now.getFullYear()+"년 "+week+"주차";
+}
+
+function rBestStores(){
+  var el2=document.getElementById("best-stores");
+  if(!el2)return;
+  el2.innerHTML="";
+
+  var rankMap=getRank();
+  var trophy={1:"🥇",2:"🥈",3:"🥉"};
+  var rankColor={1:"rank1",2:"rank2",3:"rank3"};
+
+  // 헤더
+  var hdr=el("div","best-header");
+  var wk=el("div","best-week");wk.textContent=getWeekStr();
+  var ttl=el("div","best-title");ttl.textContent="우수 구현 매장";
+  hdr.appendChild(wk);hdr.appendChild(ttl);
+  el2.appendChild(hdr);
+
+  // 순위 있는 매장 찾기
+  var ranked=Object.entries(rankMap).filter(function(e){return e[1]<=3;}).sort(function(a,b){return a[1]-b[1];});
+
+  if(!ranked.length){
+    var empty=el("div","best-empty");
+    empty.textContent="아직 모든 구역 사진이 업로드된 매장이 없어요";
+    el2.appendChild(empty);
+    return;
+  }
+
+  ranked.forEach(function(entry){
+    var sid=parseInt(entry[0]), rank=entry[1];
+    var store=SS.find(function(s){return s.id===sid;});
+    if(!store)return;
+
+    // VP 사진 (CZ[0] = VP)
+    var vpPhoto=CD[sid][0]&&CD[sid][0].photo?CD[sid][0].photo:null;
+    // AI 총점
+    var total=0;
+    CZ.forEach(function(_,i){var sc=CD[sid][i]&&CD[sid][i].aiScore;if(sc)total+=sc;});
+
+    var card=el("div","best-card "+rankColor[rank]);
+
+    // VP 사진
+    if(vpPhoto){
+      var img=el("img","best-photo");img.src=vpPhoto;
+      var vps=vpPhoto;img.onclick=function(){openLb(store.n+" VP",vps);};
+      card.appendChild(img);
+    } else {
+      var phEmpty=el("div","best-photo-empty");phEmpty.textContent="VP 사진 없음";
+      card.appendChild(phEmpty);
+    }
+
+    // 매장 정보
+    var info=el("div","best-info");
+    var rankRow=el("div","best-rank");
+    var tp=el("span","best-trophy");tp.textContent=trophy[rank];
+    var rn=el("span","best-rank-num");rn.textContent=rank+"위";
+    rankRow.appendChild(tp);rankRow.appendChild(rn);
+    var nm=el("div","best-store-name");nm.textContent=store.n;
+    info.appendChild(rankRow);info.appendChild(nm);
+    if(total>0){
+      var sc=el("div","best-score");sc.textContent="AI 평가 총점: "+total+"점";
+      info.appendChild(sc);
+    }
+    card.appendChild(info);
+    el2.appendChild(card);
+  });
+}
+
 function getRank(){
   // 4개 구역 모두 완료된 매장만 대상
   var scored = [];
