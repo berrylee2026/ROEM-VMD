@@ -1003,14 +1003,56 @@ function rZC(){
   addBar.appendChild(addInp);addBar.appendChild(addBtn);
   zcs.appendChild(addBar);
 }
+function getRank(){
+  // 4개 구역 모두 완료된 매장만 대상
+  var scored = [];
+  SS.forEach(function(s){
+    var done = getDone(s.id);
+    if(done === CZ.length){
+      // aiScore 합산
+      var total = 0;
+      var hasScore = false;
+      CZ.forEach(function(_,i){
+        var sc = CD[s.id][i] && CD[s.id][i].aiScore;
+        if(sc){total+=sc;hasScore=true;}
+      });
+      if(hasScore) scored.push({id:s.id, score:total});
+    }
+  });
+  // 점수 높은 순 정렬
+  scored.sort(function(a,b){return b.score-a.score;});
+  var rankMap = {};
+  scored.forEach(function(s,i){rankMap[s.id]=i+1;});
+  return rankMap;
+}
+
 function rCore(){
   var sl=document.getElementById("slist");sl.innerHTML="";
+  var rankMap=getRank();
+  var trophy={1:"🥇",2:"🥈",3:"🥉"};
   SS.forEach(function(s){
     var done=getDone(s.id),pct=Math.round(done/CZ.length*100);
     var sr=el("div","sr");sr.setAttribute("data-id",s.id);
     (function(sid){sr.onclick=function(){openClp(sid);};})(s.id);
-    var left=el("div","srl");var sn=el("span","sn");sn.textContent=s.id;var snm=el("span","snm");snm.textContent=s.n;left.appendChild(sn);left.appendChild(snm);sr.appendChild(left);
-    var right=el("div");right.style.cssText="display:flex;align-items:center;gap:7px";var bb=el("div","bb");var bf=el("div","bf");bf.style.width=pct+"%";bb.appendChild(bf);var pc=el("span","pct");pc.textContent=pct+"%";var ar=el("span","ar");ar.textContent="›";right.appendChild(bb);right.appendChild(pc);right.appendChild(ar);sr.appendChild(right);
+    var left=el("div","srl");
+    var sn=el("span","sn");sn.textContent=s.id;
+    var snm=el("span","snm");snm.textContent=s.n;
+    left.appendChild(sn);left.appendChild(snm);
+    sr.appendChild(left);
+    var right=el("div");right.style.cssText="display:flex;align-items:center;gap:7px";
+    var bb=el("div","bb");var bf=el("div","bf");bf.style.width=pct+"%";bb.appendChild(bf);
+    var pc=el("span","pct");pc.textContent=pct+"%";
+    // 트로피 표시
+    var rank=rankMap[s.id];
+    if(rank && rank<=3){
+      var tp=el("span");tp.style.cssText="font-size:16px;line-height:1";
+      tp.textContent=trophy[rank];
+      right.appendChild(bb);right.appendChild(pc);right.appendChild(tp);
+    } else {
+      right.appendChild(bb);right.appendChild(pc);
+    }
+    var ar=el("span","ar");ar.textContent="›";right.appendChild(ar);
+    sr.appendChild(right);
     sl.appendChild(sr);
   });
 }
