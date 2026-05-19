@@ -1114,8 +1114,7 @@ function rMqList(){
   // 상품 코드
   var codeField = el("div","mq-field");
   var codeLabel = el("div","mq-field-label"); codeLabel.textContent="상품 코드";
-  var codeTa = el("textarea"); codeTa.id="mq-draft-code"; codeTa.rows=3; codeTa.placeholder="상품 코드를 입력해 주세요
-(예: RMJKG24R13 / RMHWG24R15 / RMTJG24G14)";
+  var codeTa = el("textarea"); codeTa.id="mq-draft-code"; codeTa.rows=3; codeTa.placeholder="상품 코드를 입력해 주세요 (예: RMJKG24R13 / RMHWG24R15 / RMTJG24G14)";
   codeField.appendChild(codeLabel); codeField.appendChild(codeTa);
   addCard.appendChild(codeField);
 
