@@ -17,9 +17,11 @@ body{font-family:-apple-system,sans-serif;background:#f8f7f5;color:#1a1a1a}
 .adot{width:6px;height:6px;border-radius:50%;background:#ccc;flex-shrink:0}
 .ab.adm .adot{background:#534AB7}
 .hr2{display:flex;align-items:center;gap:10px}
-.tabbar{display:flex;background:#fff;border-bottom:1px solid #e8e5e0;position:sticky;top:57px;z-index:190}
-.tab{flex:1;text-align:center;padding:11px 4px;font-size:12px;cursor:pointer;color:#aaa;border-bottom:2px solid transparent;font-weight:500}
+.tabbar{background:#fff;border-bottom:1px solid #e8e5e0;position:sticky;top:57px;z-index:190}
+.tabrow{display:flex}
+.tab{flex:1;text-align:center;padding:9px 4px;font-size:11px;cursor:pointer;color:#aaa;border-bottom:2px solid transparent;font-weight:500}
 .tab.on{color:#534AB7;border-bottom:2px solid #534AB7}
+.tabrow:first-child .tab{border-bottom:0.5px solid #f0ede8}
 .pg{display:none;padding:14px 14px 60px}.pg.on{display:block}
 .sbar{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:#aaa;padding:6px;background:#f0f0f0;border-radius:8px;margin-bottom:12px}
 .sd{width:6px;height:6px;border-radius:50%;background:#ccc}.sd.on{background:#4CAF50;animation:bl 1.5s infinite}
@@ -154,6 +156,30 @@ textarea:disabled{opacity:0.4}
 .ft2{flex:1;line-height:1.5}.ftm2{font-size:10px;color:#aaa;margin-top:1px}
 .fd2{font-size:12px;color:#ccc;cursor:pointer;flex-shrink:0}
 .nf{font-size:11px;color:#ccc;font-style:italic}
+/* 아카이브 */
+.archive-save-card{background:#EEEDFE;border:0.5px solid #AFA9EC;border-radius:12px;padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.archive-save-info{font-size:12px;color:#534AB7;flex:1}
+.archive-save-info strong{font-size:13px;display:block;margin-bottom:2px}
+.archive-save-btn{font-size:12px;padding:8px 16px;border-radius:8px;border:none;background:#534AB7;color:#fff;cursor:pointer;white-space:nowrap;font-family:inherit;font-weight:600}
+.archive-card{background:#fff;border-radius:14px;border:0.5px solid #e8e5e0;overflow:hidden;margin-bottom:14px}
+.archive-card-header{background:#534AB7;padding:16px}
+.archive-season{font-size:11px;color:rgba(255,255,255,0.7);margin-bottom:2px}
+.archive-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:2px}
+.archive-dates{font-size:11px;color:rgba(255,255,255,0.8)}
+.archive-body{padding:14px}
+.archive-intro-label{font-size:11px;color:#aaa;margin-bottom:4px}
+.archive-intro{font-size:13px;color:#1a1a1a;line-height:1.6;margin-bottom:14px;white-space:pre-wrap}
+.archive-best-title{font-size:11px;font-weight:700;color:#534AB7;letter-spacing:0.04em;margin-bottom:10px}
+.archive-best-list{display:flex;flex-direction:column;gap:8px}
+.archive-best-item{display:flex;align-items:center;gap:10px;background:#f8f7f5;border-radius:10px;overflow:hidden}
+.archive-best-photo{width:70px;height:70px;object-fit:cover;flex-shrink:0}
+.archive-best-photo-empty{width:70px;height:70px;background:#f0ede8;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.archive-best-info{flex:1;padding:8px}
+.archive-best-rank{font-size:18px;margin-bottom:2px}
+.archive-best-name{font-size:13px;font-weight:600;color:#1a1a1a}
+.archive-best-score{font-size:11px;color:#aaa}
+.archive-del-btn{font-size:10px;padding:4px 8px;border-radius:6px;border:0.5px solid #F0997B;background:#FAECE7;color:#993C1D;cursor:pointer;margin:8px}
+.archive-empty{text-align:center;padding:60px 20px;color:#aaa;font-size:13px}
 .mq-card{background:#fff;border-radius:14px;overflow:hidden;border:0.5px solid #e8e5e0;margin-bottom:12px}
 .mq-photo-wrap{width:100%;height:240px;background:#f0ede8;overflow:hidden;cursor:zoom-in;position:relative}
 .mq-photo-wrap img{width:100%;height:100%;object-fit:cover;display:block}
@@ -281,15 +307,20 @@ textarea:disabled{opacity:0.4}
   </div>
 </div>
 <div class="tabbar">
-  <div class="tab on" onclick="goTab(0)">🩷 모델매장</div>
-  <div class="tab" onclick="goTab(1)">📊 핵심매장</div>
-  <div class="tab" onclick="goTab(2)">📐 진열 맵</div>
-  <div class="tab" onclick="goTab(3)">🏆 우수매장</div>
-  <div class="tab" onclick="goTab(4)">👗 MQ착장</div>
+  <div class="tabrow">
+    <div class="tab on" onclick="goTab(0)">📐 진열 맵</div>
+    <div class="tab" onclick="goTab(1)">🩷 모델매장</div>
+    <div class="tab" onclick="goTab(2)">📊 핵심매장</div>
+  </div>
+  <div class="tabrow">
+    <div class="tab" onclick="goTab(3)">🏆 우수매장</div>
+    <div class="tab" onclick="goTab(4)">👗 신상 MQ제안</div>
+    <div class="tab" onclick="goTab(5)">📁 아카이브</div>
+  </div>
 </div>
-<div id="pg0" class="pg on">
-  <div class="sbar"><span class="sd" id="sd0"></span><span id="sl0">연결 중...</span></div>
-  <div id="lk0" class="lk"><span>🔒 읽기 전용</span><button onclick="openPin()">관리자 로그인</button></div>
+<div id="pg1" class="pg">
+  <div class="sbar"><span class="sd" id="sd1"></span><span id="sl1">연결 중...</span></div>
+  <div id="lk1" class="lk"><span>🔒 읽기 전용</span><button onclick="openPin()">관리자 로그인</button></div>
   <div class="mc">
     <span class="mb">모델매장</span><div class="mt">스타필드 고양</div>
     <div class="stb">
@@ -311,17 +342,17 @@ textarea:disabled{opacity:0.4}
     <div id="sp2" class="sp"><div id="impl"></div></div>
   </div>
 </div>
-<div id="pg1" class="pg">
-  <div class="sbar"><span class="sd" id="sd1"></span><span id="sl1">연결 중...</span></div>
+<div id="pg2" class="pg">
+  <div class="sbar"><span class="sd" id="sd2"></span><span id="sl2">연결 중...</span></div>
   <div class="sl" id="slist"></div>
   <div class="clp" id="clp">
     <div class="clh"><span class="clt" id="clt"></span><span class="clc" onclick="closeClp()">닫기 x</span></div>
     <div class="zcs" id="zcs"></div>
   </div>
 </div>
-<div id="pg2" class="pg">
-  <div class="sbar"><span class="sd" id="sd2"></span><span id="sl2">연결 중...</span></div>
-  <div id="lk2" class="lk"><span>🔒 읽기 전용</span><button onclick="openPin()">관리자 로그인</button></div>
+<div id="pg0" class="pg on">
+  <div class="sbar"><span class="sd" id="sd0"></span><span id="sl0">연결 중...</span></div>
+  <div id="lk0" class="lk"><span>🔒 읽기 전용</span><button onclick="openPin()">관리자 로그인</button></div>
   <div id="map-add-bar"></div>
   <div class="ml2" id="ml2"></div>
 </div>
@@ -333,6 +364,11 @@ textarea:disabled{opacity:0.4}
   <div class="sbar"><span class="sd" id="sd4"></span><span id="sl4">연결 중...</span></div>
   <div id="mq-add-bar"></div>
   <div id="mq-list"></div>
+</div>
+<div id="pg5" class="pg">
+  <div class="sbar"><span class="sd" id="sd5"></span><span id="sl5">연결 중...</span></div>
+  <div id="archive-save-bar"></div>
+  <div id="archive-list"></div>
 </div>
 <div class="ov" id="ov">
   <div class="modal">
@@ -716,16 +752,18 @@ function logout(){isA=false;applyA();}
 function applyA(){
   document.getElementById("albl").textContent=isA?"관리자":"일반 유저";
   document.getElementById("ab").classList.toggle("adm",isA);
+  document.getElementById("lk1").style.display=isA?"none":"flex";
   document.getElementById("lk0").style.display=isA?"none":"flex";
-  document.getElementById("lk2").style.display=isA?"none":"flex";
   ["ds","de","tm","tt","td"].forEach(function(id){var e=document.getElementById(id);if(e)e.disabled=!isA;});
   rImpl(); rMap(); if(actS)rZC();
+  if(document.getElementById("pg5").classList.contains("on")) rArchive();
 }
 function goTab(i){
   document.querySelectorAll(".tab").forEach(function(t,j){t.classList.toggle("on",i===j);});
   document.querySelectorAll(".pg").forEach(function(p,j){p.classList.toggle("on",i===j);});
   if(i===3) rBestStores();
   if(i===4) rMqList();
+  if(i===5) rArchive();
 }
 function goSt(i){document.querySelectorAll(".st").forEach(function(t,j){t.classList.toggle("on",i===j);});document.querySelectorAll(".sp").forEach(function(p,j){p.classList.toggle("on",i===j);});}
 
@@ -1210,6 +1248,168 @@ function submitMq(){
   }).then(function(){
     mqDraft = {photo:null};
     rMqList();
+  });
+}
+
+// ── 아카이브 ──
+var archiveData = {};
+
+db.ref("archive").on("value", function(s){
+  archiveData = s.val() || {};
+  if(document.getElementById("pg5").classList.contains("on")) rArchive();
+});
+
+function saveArchive(){
+  if(!isA){alert("관리자만 저장할 수 있어요");return;}
+
+  // 현재 시즌명 입력
+  var seasonName = prompt("시즌 이름을 입력해 주세요\n(예: 4월 1차 전마, 5월 2차 전마)");
+  if(!seasonName) return;
+
+  // 모델매장 정보
+  var dateStart = document.getElementById("ds") ? document.getElementById("ds").value : "";
+  var dateEnd = document.getElementById("de") ? document.getElementById("de").value : "";
+  var theme = document.getElementById("tt") ? document.getElementById("tt").value : "";
+  var detail = document.getElementById("td") ? document.getElementById("td").value : "";
+
+  // 우수매장 정보
+  var rankMap = getRank();
+  var trophy = {1:"🥇",2:"🥈",3:"🥉"};
+  var bestStores = [];
+  [1,2,3].forEach(function(rank){
+    Object.entries(rankMap).forEach(function(e){
+      if(e[1]===rank){
+        var sid = parseInt(e[0]);
+        var store = SS.find(function(s){return s.id===sid;});
+        var vpPhoto = CD[sid][0] && CD[sid][0].photo ? CD[sid][0].photo : null;
+        var total = 0;
+        CZ.forEach(function(_,i){var sc=CD[sid][i]&&CD[sid][i].aiScore;if(sc)total+=sc;});
+        bestStores.push({
+          rank: rank,
+          trophy: trophy[rank],
+          name: store ? store.n : "",
+          photo: vpPhoto,
+          score: total
+        });
+      }
+    });
+  });
+
+  var now = new Date();
+  var savedAt = (now.getMonth()+1)+"월 "+now.getDate()+"일";
+
+  db.ref("archive").push({
+    seasonName: seasonName,
+    dateStart: dateStart,
+    dateEnd: dateEnd,
+    theme: theme,
+    detail: detail,
+    bestStores: bestStores,
+    savedAt: savedAt,
+    createdAt: Date.now()
+  }).then(function(){
+    alert(seasonName+" 아카이브가 저장되었어요!");
+  });
+}
+
+function delArchive(kid){
+  if(!isA||!confirm("이 아카이브를 삭제할까요?"))return;
+  db.ref("archive/"+kid).remove();
+}
+
+function rArchive(){
+  var saveBar = document.getElementById("archive-save-bar");
+  var listEl = document.getElementById("archive-list");
+  if(!saveBar||!listEl)return;
+
+  // 관리자 저장 버튼
+  saveBar.innerHTML = "";
+  if(isA){
+    var saveCard = el("div","archive-save-card");
+    var info = el("div","archive-save-info");
+    var strong = el("strong");strong.textContent="현재 시즌 아카이브 저장";
+    var desc = el("span");desc.textContent="런칭 정보 + 우수매장 결과를 아카이브로 보관해요";
+    info.appendChild(strong);info.appendChild(desc);
+    var saveBtn = el("button","archive-save-btn");
+    saveBtn.textContent="📁 아카이브 저장";
+    saveBtn.onclick = saveArchive;
+    saveCard.appendChild(info);saveCard.appendChild(saveBtn);
+    saveBar.appendChild(saveCard);
+  }
+
+  // 아카이브 목록 (최신순)
+  listEl.innerHTML = "";
+  var items = Object.entries(archiveData).sort(function(a,b){
+    return (b[1].createdAt||0)-(a[1].createdAt||0);
+  });
+
+  if(!items.length){
+    var empty = el("div","archive-empty");
+    empty.textContent = "아직 저장된 아카이브가 없어요";
+    listEl.appendChild(empty);
+    return;
+  }
+
+  items.forEach(function(entry){
+    var kid=entry[0], arc=entry[1];
+    var card = el("div","archive-card");
+
+    // 헤더
+    var hdr = el("div","archive-card-header");
+    var season = el("div","archive-season");season.textContent="저장일: "+( arc.savedAt||"");
+    var title = el("div","archive-title");title.textContent=arc.seasonName||"";
+    var dates = el("div","archive-dates");
+    if(arc.dateStart||arc.dateEnd) dates.textContent=(arc.dateStart||"")+" ~ "+(arc.dateEnd||"");
+    hdr.appendChild(season);hdr.appendChild(title);if(arc.dateStart||arc.dateEnd)hdr.appendChild(dates);
+    card.appendChild(hdr);
+
+    // 본문
+    var body = el("div","archive-body");
+
+    // 소개
+    if(arc.theme||arc.detail){
+      var introLabel = el("div","archive-intro-label");introLabel.textContent="구현 소개";
+      var intro = el("div","archive-intro");
+      intro.textContent=(arc.theme&&arc.detail?(arc.theme+" / "+arc.detail):arc.theme||arc.detail||"");
+      body.appendChild(introLabel);body.appendChild(intro);
+    }
+
+    // 우수매장
+    if(arc.bestStores&&arc.bestStores.length){
+      var bestTitle = el("div","archive-best-title");bestTitle.textContent="🏆 우수 구현 매장";
+      body.appendChild(bestTitle);
+      var bestList = el("div","archive-best-list");
+      arc.bestStores.forEach(function(bs){
+        var item = el("div","archive-best-item");
+        if(bs.photo){
+          var img=el("img","archive-best-photo");img.src=bs.photo;
+          var ps=bs.photo,pn=bs.name;img.onclick=function(){openLb(pn,ps);};
+          item.appendChild(img);
+        } else {
+          var pe=el("div","archive-best-photo-empty");pe.textContent="📷";
+          item.appendChild(pe);
+        }
+        var info2=el("div","archive-best-info");
+        var rankEl=el("div","archive-best-rank");rankEl.textContent=bs.trophy||"";
+        var nameEl=el("div","archive-best-name");nameEl.textContent=bs.name||"";
+        var scoreEl=el("div","archive-best-score");
+        if(bs.score>0)scoreEl.textContent="AI 평가: "+bs.score+"점";
+        info2.appendChild(rankEl);info2.appendChild(nameEl);if(bs.score>0)info2.appendChild(scoreEl);
+        item.appendChild(info2);
+        bestList.appendChild(item);
+      });
+      body.appendChild(bestList);
+    }
+
+    // 삭제 버튼 (관리자)
+    if(isA){
+      var delBtn=el("button","archive-del-btn");delBtn.textContent="삭제";
+      (function(kid){delBtn.onclick=function(){delArchive(kid);};})(kid);
+      body.appendChild(delBtn);
+    }
+
+    card.appendChild(body);
+    listEl.appendChild(card);
   });
 }
 
