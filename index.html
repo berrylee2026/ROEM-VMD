@@ -466,6 +466,7 @@ var iFloor=null, iPins={}, pinM=false, movM=false, dragId=null;
 var dsx=0, dsy=0, dpx=0, dpy=0;
 // 진열맵: Firebase에서 관리 {zid: {name, photo, order}}
 var mapZones = {};
+var mapDeployedAt = null;
 var storeCriteria = {}; // {sid: {VP:"...", "VP 메인 바닥집기":"...", WIN:"...", "메인 FACE":"..."}} // zid -> {name, photo, order, fb}
 
 function sync() {
