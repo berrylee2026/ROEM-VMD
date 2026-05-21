@@ -1604,6 +1604,30 @@ function updateUploadAlert(){
 function openLb(l,s){document.getElementById("lbi").src=s;document.getElementById("lbt").textContent=l;document.getElementById("lb").classList.add("on");}
 function closeLb(){document.getElementById("lb").classList.remove("on");}
 
+function renderMapTimerBar(){
+  var bar = document.getElementById("map-timer-bar");
+  if(!bar) return;
+  bar.innerHTML = "";
+  if(!isA) return;
+  var timerCard = el("div");
+  timerCard.style.cssText = "background:#f0eeff;border:0.5px solid #AFA9EC;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between";
+  var info = el("div");
+  info.style.cssText = "font-size:12px;color:#534AB7";
+  if(mapDeployedAt){
+    var hours = Math.floor((Date.now()-mapDeployedAt)/3600000);
+    var mins = Math.floor(((Date.now()-mapDeployedAt)%3600000)/60000);
+    info.textContent = "⏱️ 진열맵 배포 후 "+hours+"시간 "+mins+"분 경과";
+  } else {
+    info.textContent = "⏱️ 진열맵 배포 타이머 미설정";
+  }
+  var btn = el("button");
+  btn.style.cssText = "font-size:11px;padding:5px 10px;border-radius:7px;border:0.5px solid #AFA9EC;background:#534AB7;color:#fff;cursor:pointer;white-space:nowrap";
+  btn.textContent = "타이머 초기화";
+  btn.onclick = resetMapTimer;
+  timerCard.appendChild(info); timerCard.appendChild(btn);
+  bar.appendChild(timerCard);
+}
+
 function rMap(){
   var el2 = document.getElementById("ml2"); if(!el2) return;
   el2.innerHTML = "";
