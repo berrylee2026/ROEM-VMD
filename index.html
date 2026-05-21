@@ -318,6 +318,12 @@ textarea:disabled{opacity:0.4}
     <div class="tab" onclick="goTab(5)">📁 아카이브</div>
   </div>
 </div>
+<div id="pg0" class="pg on">
+  <div class="sbar"><span class="sd" id="sd0"></span><span id="sl0">연결 중...</span></div>
+  <div id="lk0" class="lk"><span>🔒 읽기 전용</span><button onclick="openPin()">관리자 로그인</button></div>
+  <div id="map-add-bar"></div>
+  <div class="ml2" id="ml2"></div>
+</div>
 <div id="pg1" class="pg">
   <div class="sbar"><span class="sd" id="sd1"></span><span id="sl1">연결 중...</span></div>
   <div id="lk1" class="lk"><span>🔒 읽기 전용</span><button onclick="openPin()">관리자 로그인</button></div>
@@ -349,12 +355,6 @@ textarea:disabled{opacity:0.4}
     <div class="clh"><span class="clt" id="clt"></span><span class="clc" onclick="closeClp()">닫기 x</span></div>
     <div class="zcs" id="zcs"></div>
   </div>
-</div>
-<div id="pg0" class="pg on">
-  <div class="sbar"><span class="sd" id="sd0"></span><span id="sl0">연결 중...</span></div>
-  <div id="lk0" class="lk"><span>🔒 읽기 전용</span><button onclick="openPin()">관리자 로그인</button></div>
-  <div id="map-add-bar"></div>
-  <div class="ml2" id="ml2"></div>
 </div>
 <div id="pg3" class="pg">
   <div class="sbar"><span class="sd" id="sd3"></span><span id="sl3">연결 중...</span></div>
@@ -760,7 +760,10 @@ function applyA(){
 }
 function goTab(i){
   document.querySelectorAll(".tab").forEach(function(t,j){t.classList.toggle("on",i===j);});
-  document.querySelectorAll(".pg").forEach(function(p,j){p.classList.toggle("on",i===j);});
+  for(var j=0;j<6;j++){
+    var pg=document.getElementById("pg"+j);
+    if(pg)pg.classList.toggle("on",i===j);
+  }
   if(i===3) rBestStores();
   if(i===4) rMqList();
   if(i===5) rArchive();
