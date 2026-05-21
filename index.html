@@ -157,6 +157,26 @@ textarea:disabled{opacity:0.4}
 .fd2{font-size:12px;color:#ccc;cursor:pointer;flex-shrink:0}
 .nf{font-size:11px;color:#ccc;font-style:italic}
 /* 아카이브 */
+.alert-popup{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:flex-end;justify-content:center;z-index:9990;padding:0}
+.alert-popup.show{display:flex}
+.alert-popup-inner{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:500px;padding:20px 20px 36px;max-height:70vh;overflow-y:auto}
+.alert-popup-handle{width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto 16px}
+.alert-popup-title{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px}
+.alert-popup-sub{font-size:12px;color:#aaa;margin-bottom:16px}
+.alert-popup-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.alert-popup-item{background:#FFF8E7;border:0.5px solid #FFD86B;border-radius:10px;padding:10px 12px}
+.alert-popup-store{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:2px}
+.alert-popup-zones{font-size:11px;color:#B8860B}
+.alert-popup-complete{background:#E8F5E9;border:0.5px solid #81C784;border-radius:10px;padding:12px;text-align:center;font-size:13px;color:#2E7D32;font-weight:600}
+.alert-popup-close{width:100%;padding:12px;border-radius:10px;border:none;background:#534AB7;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.upload-alert{background:#FFF3CD;border:0.5px solid #FFB800;border-radius:10px;padding:12px 14px;margin-bottom:12px;display:none}
+.upload-alert.show{display:block}
+.upload-alert-title{font-size:12px;font-weight:700;color:#856404;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.upload-alert-list{display:flex;flex-direction:column;gap:3px}
+.upload-alert-item{font-size:11px;color:#856404;padding:3px 0;border-bottom:0.5px solid rgba(133,100,4,0.15)}
+.upload-alert-item:last-child{border-bottom:none}
+.upload-alert-complete{background:#D4EDDA;border-color:#28A745}
+.upload-alert-complete .upload-alert-title{color:#155724}
 .archive-save-card{background:#EEEDFE;border:0.5px solid #AFA9EC;border-radius:12px;padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .archive-save-info{font-size:12px;color:#534AB7;flex:1}
 .archive-save-info strong{font-size:13px;display:block;margin-bottom:2px}
@@ -180,6 +200,22 @@ textarea:disabled{opacity:0.4}
 .archive-best-score{font-size:11px;color:#aaa}
 .archive-del-btn{font-size:10px;padding:4px 8px;border-radius:6px;border:0.5px solid #F0997B;background:#FAECE7;color:#993C1D;cursor:pointer;margin:8px}
 .archive-empty{text-align:center;padding:60px 20px;color:#aaa;font-size:13px}
+.map-gallery{display:flex;flex-direction:column;gap:0}
+.map-gallery-item{position:relative;cursor:zoom-in;border-bottom:0.5px solid #e8e5e0}
+.map-gallery-item img{display:block;width:100%;height:auto}
+.map-gallery-item-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.55));padding:10px 12px 8px;display:flex;align-items:flex-end;justify-content:space-between}
+.map-gallery-item-name{font-size:13px;font-weight:600;color:#fff}
+.map-gallery-item-idx{font-size:11px;color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.3);padding:2px 7px;border-radius:10px}
+.map-gallery-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:140px;background:#f8f7f5;border-bottom:0.5px solid #e8e5e0;cursor:pointer}
+.map-gallery-empty .phico{font-size:24px;margin-bottom:4px;color:#ccc}
+.map-gallery-empty .phtxt{font-size:12px;color:#ccc}
+.map-gallery-admin-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f8f7f5;border-bottom:0.5px solid #e8e5e0}
+.map-gallery-admin-name{font-size:12px;color:#1a1a1a;font-weight:500}
+.map-gallery-admin-acts{display:flex;gap:6px}
+.map-fb-section{padding:10px 12px;border-bottom:0.5px solid #f0ede8;background:#fff}
+.map-fb-toggle{font-size:11px;color:#534AB7;cursor:pointer;display:flex;align-items:center;gap:4px}
+.map-fb-body{display:none;margin-top:8px}
+.map-fb-body.open{display:block}
 .mq-card{background:#fff;border-radius:14px;overflow:hidden;border:0.5px solid #e8e5e0;margin-bottom:12px}
 .mq-photo-wrap{width:100%;height:240px;background:#f0ede8;overflow:hidden;cursor:zoom-in;position:relative}
 .mq-photo-wrap img{width:100%;height:100%;object-fit:cover;display:block}
@@ -321,6 +357,7 @@ textarea:disabled{opacity:0.4}
 <div id="pg0" class="pg on">
   <div class="sbar"><span class="sd" id="sd0"></span><span id="sl0">연결 중...</span></div>
   <div id="lk0" class="lk"><span>🔒 읽기 전용</span><button onclick="openPin()">관리자 로그인</button></div>
+  <div id="map-timer-bar"></div>
   <div id="map-add-bar"></div>
   <div class="ml2" id="ml2"></div>
 </div>
@@ -350,6 +387,10 @@ textarea:disabled{opacity:0.4}
 </div>
 <div id="pg2" class="pg">
   <div class="sbar"><span class="sd" id="sd2"></span><span id="sl2">연결 중...</span></div>
+  <div id="upload-alert" class="upload-alert">
+    <div class="upload-alert-title">⚠️ 사진 미업로드 매장</div>
+    <div class="upload-alert-list" id="upload-alert-list"></div>
+  </div>
   <div class="sl" id="slist"></div>
   <div class="clp" id="clp">
     <div class="clh"><span class="clt" id="clt"></span><span class="clc" onclick="closeClp()">닫기 x</span></div>
@@ -384,6 +425,15 @@ textarea:disabled{opacity:0.4}
       <div class="key" onclick="pk(-1)">x</div>
     </div>
     <div class="can" onclick="closePin()">취소</div>
+  </div>
+</div>
+<div class="alert-popup" id="alert-popup">
+  <div class="alert-popup-inner">
+    <div class="alert-popup-handle"></div>
+    <div class="alert-popup-title" id="alert-popup-title">📋 사진 업로드 현황</div>
+    <div class="alert-popup-sub" id="alert-popup-sub"></div>
+    <div class="alert-popup-list" id="alert-popup-list"></div>
+    <button class="alert-popup-close" onclick="closeAlertPopup()">확인</button>
   </div>
 </div>
 <div class="lb" id="lb" onclick="if(event.target===this)closeLb()">
@@ -1262,6 +1312,12 @@ db.ref("archive").on("value", function(s){
   if(document.getElementById("pg5").classList.contains("on")) rArchive();
 });
 
+function resetMapTimer(){
+  if(!isA||!confirm("진열맵 배포 타이머를 지금 시점으로 초기화할까요?\n(새 시즌 시작 시 사용)")) return;
+  db.ref("mapDeployedAt").set(Date.now());
+  alert("타이머가 현재 시각으로 초기화되었어요!");
+}
+
 function saveArchive(){
   if(!isA){alert("관리자만 저장할 수 있어요");return;}
 
@@ -1541,6 +1597,98 @@ function rCore(){
     sr.appendChild(right);
     sl.appendChild(sr);
   });
+  updateUploadAlert();
+}
+
+function showAlertPopup(){
+  var titleEl = document.getElementById("alert-popup-title");
+  var subEl = document.getElementById("alert-popup-sub");
+  var listEl = document.getElementById("alert-popup-list");
+  if(!titleEl||!listEl) return;
+
+  var missing = [];
+  SS.forEach(function(s){
+    var missingZones = CZ.filter(function(z,i){return !CD[s.id][i].photo;});
+    if(missingZones.length) missing.push({name:s.n, zones:missingZones});
+  });
+
+  listEl.innerHTML = "";
+
+  // 모두 완료
+  if(!missing.length){
+    titleEl.textContent = "✅ 업로드 완료";
+    subEl.textContent = "모든 매장 사진이 업로드되었어요!";
+    var comp = el("div","alert-popup-complete");
+    comp.textContent = "🎉 10개 매장 모두 완료!";
+    listEl.appendChild(comp);
+    document.getElementById("alert-popup").classList.add("show");
+    return;
+  }
+
+  // 진열맵 배포 시점 확인
+  if(!mapDeployedAt){
+    // 진열맵 미배포 - 팝업 안 띄움
+    return;
+  }
+
+  var now = Date.now();
+  var elapsed = now - mapDeployedAt;
+  var hours = Math.floor(elapsed / 3600000);
+  var H24 = 24 * 3600000;
+  var H48 = 48 * 3600000;
+
+  // 24시간 미만 - 팝업 안 띄움
+  if(elapsed < H24) return;
+
+  // 24시간 이상 ~ 48시간 미만
+  if(elapsed < H48){
+    titleEl.textContent = "⚠️ 사진 업로드 필요";
+    subEl.textContent = "진열맵 배포 "+hours+"시간 경과 · 48시간 내 완료해 주세요";
+  } else {
+    // 48시간 초과
+    titleEl.textContent = "🚨 업로드 기한 초과";
+    subEl.textContent = "진열맵 배포 "+hours+"시간 경과 · 즉시 업로드해 주세요!";
+  }
+
+  missing.forEach(function(m){
+    var item = el("div","alert-popup-item");
+    var store = el("div","alert-popup-store"); store.textContent = "📍 "+m.name;
+    var zones = el("div","alert-popup-zones"); zones.textContent = "미업로드: "+m.zones.join(", ");
+    item.appendChild(store); item.appendChild(zones);
+    listEl.appendChild(item);
+  });
+  document.getElementById("alert-popup").classList.add("show");
+}
+
+function closeAlertPopup(){
+  document.getElementById("alert-popup").classList.remove("show");
+}
+
+function updateUploadAlert(){
+  var alertEl = document.getElementById("upload-alert");
+  var listEl = document.getElementById("upload-alert-list");
+  if(!alertEl||!listEl) return;
+
+  var missing = [];
+  SS.forEach(function(s){
+    var done = getDone(s.id);
+    if(done < CZ.length){
+      var missingZones = CZ.filter(function(z,i){
+        return !CD[s.id][i].photo;
+      });
+      missing.push({name: s.n, zones: missingZones});
+    }
+  });
+
+  if(!missing.length){
+    alertEl.className = "upload-alert show upload-alert-complete";
+    listEl.innerHTML = "<div class='upload-alert-item'>✅ 모든 매장 사진 업로드 완료!</div>";
+  } else {
+    alertEl.className = "upload-alert show";
+    listEl.innerHTML = missing.map(function(m){
+      return "<div class='upload-alert-item'>📍 "+m.name+" · 미업로드: "+m.zones.join(", ")+"</div>";
+    }).join("");
+  }
 }
 function openLb(l,s){document.getElementById("lbi").src=s;document.getElementById("lbt").textContent=l;document.getElementById("lb").classList.add("on");}
 function closeLb(){document.getElementById("lb").classList.remove("on");}
@@ -1548,4 +1696,113 @@ function closeLb(){document.getElementById("lb").classList.remove("on");}
 rCore(); rMap(); rImpl(); applyA();
 </script>
 </body>
-</html>
+</htmlfunction rMap(){
+  var el2 = document.getElementById("ml2"); if(!el2) return;
+  el2.innerHTML = "";
+  renderMapTimerBar();
+
+  // 관리자: 구역 추가 바
+  if(isA){
+    var addBar2 = document.getElementById("map-add-bar");
+    if(addBar2){
+      addBar2.innerHTML = "";
+      var bar = el("div","add-zone-bar");
+      var inp = el("input","add-zone-input"); inp.id="new-zone-name"; inp.placeholder="새 구역 이름 입력";
+      var btn = el("button","add-zone-btn"); btn.textContent="+ 구역 추가"; btn.onclick=addZone;
+      bar.appendChild(inp); bar.appendChild(btn); addBar2.appendChild(bar);
+    }
+  }
+
+  var gallery = el("div","map-gallery");
+  var zones = Object.entries(mapZones).sort(function(a,b){return (a[1].order||0)-(b[1].order||0);});
+
+  if(!zones.length){
+    var empty2 = el("div"); empty2.style.cssText="text-align:center;padding:40px;font-size:13px;color:#aaa";
+    empty2.textContent = isA ? "구역을 추가해 주세요" : "아직 등록된 구역이 없어요";
+    el2.appendChild(empty2); return;
+  }
+
+  zones.forEach(function(entry, idx){
+    var zid=entry[0], z=entry[1];
+    var src=z.photo||null;
+    var wrap = el("div","map-gallery-item");
+
+    if(src){
+      // 이미지
+      var img = el("img"); img.src=src; img.alt=z.name;
+      var zn=z.name, sr=src;
+      img.onclick=function(){openLb(zn,sr);};
+      wrap.appendChild(img);
+      // 이름 레이블 (이미지 위에)
+      var lbl = el("div","map-gallery-item-label");
+      var nm = el("span","map-gallery-item-name"); nm.textContent=z.name;
+      var idxSpan = el("span","map-gallery-item-idx"); idxSpan.textContent=String(idx+1).padStart(2,"0");
+      lbl.appendChild(nm); lbl.appendChild(idxSpan);
+      wrap.appendChild(lbl);
+    } else {
+      // 사진 없음
+      var emptyBox = el("div","map-gallery-empty");
+      if(isA){(function(zid){emptyBox.onclick=function(){upMPh(zid);};})(zid);}
+      var eIco=el("div","phico"); eIco.textContent="📷";
+      var eTxt=el("div","phtxt"); eTxt.textContent=isA?"탭하여 업로드 ("+z.name+")":"사진 없음 ("+z.name+")";
+      emptyBox.appendChild(eIco); emptyBox.appendChild(eTxt);
+      wrap.appendChild(emptyBox);
+    }
+
+    // 관리자 액션 바
+    if(isA){
+      var adminBar = el("div","map-gallery-admin-bar");
+      var adminName = el("div","map-gallery-admin-name"); adminName.textContent=z.name;
+      var adminActs = el("div","map-gallery-admin-acts");
+      var upBtn = el("span","mu"); upBtn.textContent="교체";
+      (function(zid){upBtn.onclick=function(){upMPh(zid);};})(zid);
+      adminActs.appendChild(upBtn);
+      if(src){
+        var delBtn = el("span","md"); delBtn.textContent="삭제";
+        (function(zid){delBtn.onclick=function(){dMPh(zid);};})(zid);
+        adminActs.appendChild(delBtn);
+      }
+      var zDelBtn = el("span","md"); zDelBtn.textContent="구역삭제";
+      (function(zid){zDelBtn.onclick=function(){delZone(zid);};})(zid);
+      adminActs.appendChild(zDelBtn);
+      adminBar.appendChild(adminName); adminBar.appendChild(adminActs);
+      wrap.appendChild(adminBar);
+    }
+
+    // 피드백 섹션 (토글)
+    var fbSec = el("div","map-fb-section");
+    var fbToggle = el("div","map-fb-toggle");
+    var fbs = Object.entries(z.fb||{});
+    fbToggle.innerHTML = "💬 VMD 피드백 "+(fbs.length?"("+fbs.length+")":"");
+    var fbBody = el("div","map-fb-body"); fbBody.id="fb-body-"+zid;
+    (function(fbBody){fbToggle.onclick=function(){fbBody.classList.toggle("open");};})(fbBody);
+
+    // 피드백 목록
+    var fl = el("div","fl2"); fl.id="fl"+zid;
+    if(!fbs.length){fl.innerHTML="<div class='nf'>아직 피드백이 없어요</div>";}
+    else{
+      fbs.forEach(function(en){
+        var fid=en[0],f=en[1];
+        var item=el("div","fi3");
+        var fbt=el("div","ft2");
+        if(f.isA){var tag=el("span","at");tag.textContent="관리자";fbt.appendChild(tag);}
+        fbt.appendChild(txt(f.text));
+        var ftm=el("div","ftm2");ftm.textContent=f.time;fbt.appendChild(ftm);
+        item.appendChild(fbt);
+        if(isA){var fd=el("span","fd2");fd.textContent="x";(function(z,fi){fd.onclick=function(){dMFb(z,fi);};})(zid,fid);item.appendChild(fd);}
+        fl.appendChild(item);
+      });
+    }
+    var fr2 = el("div","fr2");
+    var fi2 = el("textarea","fi2"); fi2.id="fi"+zid; fi2.placeholder="피드백 입력"; fi2.rows=2;
+    var fb2 = el("button","fb2"); fb2.textContent="등록";
+    (function(zid){fb2.onclick=function(){aMFb(zid);};})(zid);
+    fr2.appendChild(fi2); fr2.appendChild(fb2);
+    fbBody.appendChild(fl); fbBody.appendChild(fr2);
+    fbSec.appendChild(fbToggle); fbSec.appendChild(fbBody);
+    wrap.appendChild(fbSec);
+    gallery.appendChild(wrap);
+  });
+  el2.appendChild(gallery);
+}
+>
