@@ -217,8 +217,8 @@ textarea:disabled{opacity:0.4}
 .map-fb-body{display:none;margin-top:8px}
 .map-fb-body.open{display:block}
 .mq-card{background:#fff;border-radius:14px;overflow:hidden;border:0.5px solid #e8e5e0;margin-bottom:12px}
-.mq-photo-wrap{width:100%;height:240px;background:#f0ede8;overflow:hidden;cursor:zoom-in;position:relative}
-.mq-photo-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.mq-photo-wrap{width:100%;background:#1a1a1a;overflow:hidden;cursor:zoom-in;position:relative}
+.mq-photo-wrap img{width:100%;height:auto;max-height:80vh;object-fit:contain;display:block;margin:0 auto}
 .mq-photo-empty{width:100%;height:240px;background:#f8f7f5;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border-bottom:0.5px solid #e8e5e0}
 .mq-photo-empty .phico{font-size:28px;margin-bottom:6px;color:#ccc}
 .mq-photo-empty .phtxt{font-size:12px;color:#ccc}
@@ -236,7 +236,7 @@ textarea:disabled{opacity:0.4}
 .mq-add-card{background:#fff;border-radius:14px;border:1px dashed #AFA9EC;padding:16px;margin-bottom:16px}
 .mq-add-title{font-size:13px;font-weight:600;color:#534AB7;margin-bottom:12px}
 .mq-add-photo{width:100%;height:180px;border-radius:10px;border:1px dashed #ddd;background:#f8f7f5;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;margin-bottom:12px;overflow:hidden}
-.mq-add-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.mq-add-photo img{width:100%;height:auto;max-height:180px;object-fit:contain;display:block}
 .mq-add-photo .phico{font-size:28px;margin-bottom:6px;color:#ccc}
 .mq-add-photo .phtxt{font-size:12px;color:#ccc}
 .mq-field{margin-bottom:10px}
@@ -550,106 +550,7 @@ function dMPh(zid) {
   db.ref("mapZones/" + zid + "/photo").set(null);
 }
 
-function rMap() {
-  var el2 = document.getElementById("ml2"); if (!el2) return;
-  el2.innerHTML = "";
-  // 구역 추가 바 (관리자만)
-  var addBar = document.getElementById("map-add-bar"); if (addBar) addBar.innerHTML = "";
-  if (isA && addBar) {
-    var bar = el("div","add-zone-bar");
-    var inp = el("input","add-zone-input"); inp.id="new-zone-name"; inp.placeholder="새 구역 이름 입력";
-    var btn = el("button","add-zone-btn"); btn.textContent="+ 구역 추가"; btn.onclick=addZone;
-    bar.appendChild(inp); bar.appendChild(btn); addBar.appendChild(bar);
-  }
-  // 구역 목록 (order 순 정렬)
-  var zones = Object.entries(mapZones).sort(function(a,b){return (a[1].order||0)-(b[1].order||0);});
-  if (!zones.length) {
-    var empty = el("div"); empty.style.cssText="text-align:center;padding:40px;font-size:13px;color:#aaa";
-    empty.textContent = isA ? "구역을 추가해 주세요" : "아직 등록된 구역이 없어요";
-    el2.appendChild(empty); return;
-  }
-  zones.forEach(function(entry, idx) {
-    var zid = entry[0], z = entry[1];
-    var src = z.photo || null;
-    var mmc = el("div","mmc"), mmt = el("div","mmt");
-    // 사진
-    var phEl;
-    if (src) {
-      phEl = el("div","mpw");
-      var img = el("img"); img.src=src; img.alt=z.name;
-      var zn=z.name, sr=src;
-      phEl.onclick=function(){openLb(zn,sr);};
-      phEl.appendChild(img);
-    } else {
-      phEl = el("div","mpe"+(isA?" cp":""));
-      if(isA){(function(zid){phEl.onclick=function(){upMPh(zid);};})(zid);}
-      phEl.innerHTML="<div class='mpi'>📷</div><div class='mpt'>"+(isA?"탭하여 업로드":"사진 없음")+"</div>";
-    }
-    mmt.appendChild(phEl);
-    var mr = el("div","mr2");
-    var mlbl = el("div","mlbl");
-    var mll = el("div","mll");
-    var mi = el("span","mi"); mi.textContent=String(idx+1).padStart(2,"0");
-    if (isA) {
-      // 이름 편집 가능
-      var mzni = el("input","mzn-input"); mzni.value=z.name;
-      (function(zid){mzni.onchange=function(){renameZone(zid,this.value);};})(zid);
-      mll.appendChild(mi); mll.appendChild(mzni);
-    } else {
-      var mzn = el("span","mzn"); mzn.textContent=z.name;
-      mll.appendChild(mi); mll.appendChild(mzn);
-    }
-    mlbl.appendChild(mll);
-    if (isA) {
-      var ma = el("div","ma");
-      var mu = el("span","mu"); mu.textContent="교체";
-      (function(zid){mu.onclick=function(){upMPh(zid);};})(zid);
-      ma.appendChild(mu);
-      if (src) {
-        var mdel = el("span","md"); mdel.textContent="사진삭제";
-        (function(zid){mdel.onclick=function(){dMPh(zid);};})(zid);
-        ma.appendChild(mdel);
-      }
-      var mdz = el("span","md"); mdz.textContent="구역삭제";
-      (function(zid){mdz.onclick=function(){delZone(zid);};})(zid);
-      ma.appendChild(mdz);
-      mlbl.appendChild(ma);
-    }
-    mr.appendChild(mlbl);
-    // 피드백
-    var fs = el("div","fs");
-    var ft = el("div","ft"); ft.textContent="VMD 피드백";
-    var fl2 = el("div","fl2"); fl2.id="fl"+zid;
-    var fbs = Object.entries(z.fb||{});
-    if (!fbs.length) {
-      fl2.innerHTML="<div class='nf'>아직 피드백이 없어요</div>";
-    } else {
-      fbs.forEach(function(en){
-        var fid=en[0],f=en[1];
-        var item=el("div","fi3");
-        var fbt=el("div","ft2");
-        if(f.isA){var tag=el("span","at");tag.textContent="관리자";fbt.appendChild(tag);}
-        // AI 평가 결과: 관리자는 상세, 유저는 요약
-        if(f.isAiResult && f.detail && isA){
-          fbt.appendChild(txt(f.detail));
-        } else {
-          fbt.appendChild(txt(f.text));
-        }
-        var ftm=el("div","ftm2");ftm.textContent=f.time;fbt.appendChild(ftm);
-        item.appendChild(fbt);
-        if(isA){var fd=el("span","fd2");fd.textContent="x";(function(z,fi){fd.onclick=function(){dMFb(z,fi);};})(zid,fid);item.appendChild(fd);}
-        fl2.appendChild(item);
-      });
-    }
-    var fr2 = el("div","fr2");
-    var fi2 = el("textarea","fi2"); fi2.id="fi"+zid; fi2.placeholder="피드백 입력"; fi2.rows=2;
-    var fb2 = el("button","fb2"); fb2.textContent="등록";
-    (function(zid){fb2.onclick=function(){aMFb(zid);};})(zid);
-    fr2.appendChild(fi2); fr2.appendChild(fb2);
-    fs.appendChild(ft); fs.appendChild(fl2); fs.appendChild(fr2);
-    mr.appendChild(fs); mmt.appendChild(mr); mmc.appendChild(mmt); el2.appendChild(mmc);
-  });
-}
+
 function aMFb(zid) {
   var i=document.getElementById("fi"+zid); var t=i?i.value.trim():""; if(!t)return;
   var now=new Date(); var tm=(now.getMonth()+1)+"/"+now.getDate()+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
@@ -1195,6 +1096,14 @@ function rMqList(){
   };
   addCard.appendChild(photoBox);
 
+  // 매장명 직접 입력
+  var storeField = el("div","mq-field");
+  var storeLabel = el("div","mq-field-label"); storeLabel.textContent="매장명";
+  var storeTa = el("input"); storeTa.id="mq-draft-store"; storeTa.style.cssText="width:100%;background:#f8f7f5;border:0.5px solid #e8e5e0;border-radius:8px;padding:8px 10px;font-size:13px;color:#1a1a1a;font-family:inherit;outline:none";
+  storeTa.placeholder="매장명을 입력해 주세요 (예: 강남 이스퀘어)";
+  storeField.appendChild(storeLabel); storeField.appendChild(storeTa);
+  addCard.appendChild(storeField);
+
   // 착장 컨셉
   var conceptField = el("div","mq-field");
   var conceptLabel = el("div","mq-field-label"); conceptLabel.textContent="착장 컨셉";
@@ -1286,10 +1195,12 @@ function submitMq(){
   var codeVal=code?code.value.trim():"";
   if(!conceptVal){alert("착장 컨셉을 입력해 주세요!");return;}
 
+  var storeInp=document.getElementById("mq-draft-store");
+  var storeNameVal=storeInp?storeInp.value.trim():"";
+  if(!storeNameVal){alert("매장명을 입력해 주세요!");return;}
   var now=new Date();
   var date=(now.getMonth()+1)+"/"+now.getDate()+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
-  // 매장명 추정 (actS 기준)
-  var storeName = actS ? SS.find(function(s){return s.id===actS;}).n : "익명";
+  var storeName = storeNameVal;
 
   db.ref("mqPosts").push({
     photo: mqDraft.photo,
@@ -1693,10 +1604,7 @@ function updateUploadAlert(){
 function openLb(l,s){document.getElementById("lbi").src=s;document.getElementById("lbt").textContent=l;document.getElementById("lb").classList.add("on");}
 function closeLb(){document.getElementById("lb").classList.remove("on");}
 
-rCore(); rMap(); rImpl(); applyA();
-</script>
-</body>
-</htmlfunction rMap(){
+function rMap(){
   var el2 = document.getElementById("ml2"); if(!el2) return;
   el2.innerHTML = "";
   renderMapTimerBar();
@@ -1805,4 +1713,8 @@ rCore(); rMap(); rImpl(); applyA();
   });
   el2.appendChild(gallery);
 }
->
+
+rCore(); rMap(); rImpl(); applyA();
+</script>
+</body>
+</html>
