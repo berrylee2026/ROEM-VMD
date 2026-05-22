@@ -1646,12 +1646,15 @@ function moveZone(zid, dir){
   if(idx===-1) return;
   var newIdx = idx + dir;
   if(newIdx < 0 || newIdx >= zones.length) return;
-  // 두 구역의 order 값 스왑
-  var aId = zones[idx][0], bId = zones[newIdx][0];
-  var aOrder = mapZones[aId].order || idx;
-  var bOrder = mapZones[bId].order || newIdx;
-  db.ref("mapZones/"+aId+"/order").set(bOrder);
-  db.ref("mapZones/"+bId+"/order").set(aOrder);
+  // 배열에서 위치 이동
+  var moved = zones.splice(idx, 1)[0];
+  zones.splice(newIdx, 0, moved);
+  // 전체 order 값을 순서대로 재할당
+  var updates = {};
+  zones.forEach(function(e, i){
+    updates["mapZones/"+e[0]+"/order"] = i;
+  });
+  db.ref().update(updates);
 }
 
 function upNCPh(){
