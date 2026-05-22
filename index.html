@@ -461,7 +461,7 @@ var SS = [
 var CZ = ["VP","VP 메인 바닥집기","WIN","메인 FACE"];
 var isA = false, actS = null, opZ = {}, ps = "";
 var CD = {};
-SS.forEach(function(s) { CD[s.id] = CZ.map(function() { return {photo:null,checked:false,fb:{}}; }); CD[s.id].extra={}; });
+SS.forEach(function(s) { CD[s.id] = CZ.map(function() { return {photo:null,photo2:null,checked:false,fb:{}}; }); CD[s.id].extra={}; });
 var iFloor=null, iPins={}, pinM=false, movM=false, dragId=null;
 var dsx=0, dsy=0, dpx=0, dpy=0;
 // 진열맵: Firebase에서 관리 {zid: {name, photo, order}}
@@ -504,7 +504,7 @@ function saveM() {
   db.ref("model").set({dateStart:document.getElementById("ds").value,dateEnd:document.getElementById("de").value,memo:document.getElementById("tm").value,theme:document.getElementById("tt").value,detail:document.getElementById("td").value});
 }
 function sImpl(){db.ref("impl").set({floor:iFloor,pins:iPins});}
-function sCore(sid,zi){db.ref("core/"+sid+"/"+zi).set({checked:CD[sid][zi].checked,photo:CD[sid][zi].photo||null,fb:CD[sid][zi].fb||{}});}
+function sCore(sid,zi){db.ref("core/"+sid+"/"+zi).set({checked:CD[sid][zi].checked,photo:CD[sid][zi].photo||null,photo2:CD[sid][zi].photo2||null,fb:CD[sid][zi].fb||{},aiScore:CD[sid][zi].aiScore||null});}
 
 function comp(file,mw,q,cb){
   var r=new FileReader();
@@ -915,6 +915,18 @@ function checkTotalScore(sid){
   });
 }
 
+function upZPh2(sid){
+  var zi=3; // 메인 FACE
+  pick(function(f){comp(f,600,0.65,function(c){
+    CD[sid][zi].photo2=c;
+    sCore(sid,zi);rZC();rCore();
+  });});
+}
+function rmZPh2(sid){
+  var zi=3;
+  CD[sid][zi].photo2=null;
+  sCore(sid,zi);rZC();rCore();
+}
 function rmZPh(sid,zi){CD[sid][zi].photo=null;CD[sid][zi].checked=false;sCore(sid,zi);rZC();rCore();}
 function sFb(sid,zi){var inp=document.getElementById("cfi_"+sid+"_"+zi);var t=inp?inp.value.trim():"";if(!t)return;var now=new Date();var tm=(now.getMonth()+1)+"/"+now.getDate()+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");db.ref("core/"+sid+"/"+zi+"/fb").push({text:t,time:tm,isA:isA});inp.value="";}
 function dFb(sid,zi,fid){db.ref("core/"+sid+"/"+zi+"/fb/"+fid).remove();}
@@ -1012,8 +1024,29 @@ function rZC(){
     zh.appendChild(zck);zh.appendChild(zn);zh.appendChild(za);
     var zb=el("div","zb"+(isO?" on":""));
     var pr=el("div","pr");
-    if(d.photo){var pt=el("img","pt");pt.src=d.photo;var zz=z,ss=d.photo;pt.onclick=function(){openLb(zz,ss);};var info=el("div");var ok=el("div","ps ok");ok.textContent="사진 등록됨";var rm=el("div","pm");rm.textContent="x 삭제";(function(sid,i){rm.onclick=function(){rmZPh(sid,i);};})(sid,i);info.appendChild(ok);info.appendChild(rm);pr.appendChild(pt);pr.appendChild(info);}
-    else{var pe=el("div","pe");pe.textContent="+";(function(sid,i){pe.onclick=function(){upZPh(sid,i);};})(sid,i);var ps2=el("div","ps");ps2.textContent="사진 없음 · 탭하여 업로드";pr.appendChild(pe);pr.appendChild(ps2);}
+    if(d.photo){
+      var pt=el("img","pt");pt.src=d.photo;var zz=z,ss=d.photo;pt.onclick=function(){openLb(zz,ss);};
+      var info=el("div");var ok=el("div","ps ok");ok.textContent="사진 등록됨";
+      var rm=el("div","pm");rm.textContent="x 삭제";(function(sid,i){rm.onclick=function(){rmZPh(sid,i);};})(sid,i);
+      info.appendChild(ok);info.appendChild(rm);pr.appendChild(pt);pr.appendChild(info);
+    } else {
+      var pe=el("div","pe");pe.textContent="+";(function(sid,i){pe.onclick=function(){upZPh(sid,i);};})(sid,i);
+      var ps2=el("div","ps");ps2.textContent="사진 없음 · 탭하여 업로드";pr.appendChild(pe);pr.appendChild(ps2);
+    }
+    // 메인 FACE(zi===3)는 2번째 사진 추가
+    if(i===3){
+      var pr2=el("div","pr");
+      if(d.photo2){
+        var pt2=el("img","pt");pt2.src=d.photo2;var zz2=z+" (2번째)",ss2=d.photo2;pt2.onclick=function(){openLb(zz2,ss2);};
+        var info2=el("div");var ok2=el("div","ps ok");ok2.textContent="2번째 사진 등록됨";
+        var rm2=el("div","pm");rm2.textContent="x 삭제";(function(sid){rm2.onclick=function(){rmZPh2(sid);};})(sid);
+        info2.appendChild(ok2);info2.appendChild(rm2);pr2.appendChild(pt2);pr2.appendChild(info2);
+      } else {
+        var pe2=el("div","pe");pe2.textContent="+";(function(sid){pe2.onclick=function(){upZPh2(sid);};})(sid);
+        var ps3=el("div","ps");ps3.textContent="2번째 사진 · 탭하여 업로드";pr2.appendChild(pe2);pr2.appendChild(ps3);
+      }
+      zb.appendChild(pr2);
+    }
     zb.appendChild(pr);
     var fl=el("div","fl");fl.textContent="VMD 피드백";
     var fr=el("div","fr");
