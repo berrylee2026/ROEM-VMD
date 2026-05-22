@@ -831,18 +831,26 @@ function aiEval(sid,zi,photo){
   var maxScore=zoneItems.reduce(function(a,c){return a+c.score;},0);
 
   var refImgs=[];
-  // 해당 매장 도면 우선 참고
+  // 해당 매장 도면 참고 (평면도/입면도)
   var storeCrit=storeCriteria[sid]||{};
   if(storeCrit.floorPlan) refImgs.push(storeCrit.floorPlan);
   if(storeCrit.elevations){
     Object.values(storeCrit.elevations).forEach(function(e){if(e.photo)refImgs.push(e.photo);});
   }
-  // 진열맵/구현맵 사진
-  Object.values(mapZones).forEach(function(z){if(z.photo)refImgs.push(z.photo);});
+  // 진열맵에서 구역명에 VP/WIN/FACE 포함된 사진만 참고
+  var targetKeywords = ["VP","WIN","FACE","메인"];
+  Object.values(mapZones).forEach(function(z){
+    if(z.photo && z.name){
+      var nameUpper = z.name.toUpperCase();
+      var isTarget = targetKeywords.some(function(k){ return nameUpper.indexOf(k.toUpperCase())!==-1; });
+      if(isTarget) refImgs.push(z.photo);
+    }
+  });
+  // 구현맵 핀 사진
   Object.values(iPins).forEach(function(p){if(p.photo)refImgs.push(p.photo);});
 
   var userContent=[];
-  userContent.push({type:"text",text:"당신은 패션 브랜드 ROEM의 VMD 전문가입니다.\n\n매장: "+storeName+"\n구역: "+zoneName+customText+"\n\n[평가 기준]\n"+criteriaText+(refImgs.length>0?"\n\n[참고] 함께 제공된 이미지: 첫 번째는 매장 도면(평면도/입면도)이며, 이를 참고하여 해당 매장의 실제 사양(페이스 크기, 행어 간격 등)에 맞게 평가하세요.":"")+"\n\n위 기준으로 사진을 평가하세요. 매장 특이사항과 도면이 있다면 해당 매장 기준에 맞게 평가하세요.\n\n반드시 아래 형식으로만 출력하세요:\n---상세---\nNo.번호 - 점수/만점 - 한줄평가\n(항목 수만큼 반복)\n총점: XX/"+maxScore+"점\n---요약---\n한 문장으로 핵심만 (예: 마네킹 착장 양호, POP 미설치 개선 필요)"});
+  userContent.push({type:"text",text:"당신은 패션 브랜드 ROEM의 VMD 전문가입니다.\n\n매장: "+storeName+"\n구역: "+zoneName+customText+"\n\n[평가 기준]\n"+criteriaText+(refImgs.length>0?"\n\n[참고 이미지 안내] 함께 제공된 이미지는 매장 도면 및 진열맵(VP/WIN/메인FACE) 기준 사진입니다. 이를 기준으로 업로드된 매장 사진과 비교하여 평가하세요.":"")+"\n\n위 기준으로 사진을 평가하세요. 매장 특이사항과 도면이 있다면 해당 매장 기준에 맞게 평가하세요.\n\n반드시 아래 형식으로만 출력하세요:\n---상세---\nNo.번호 - 점수/만점 - 한줄평가\n(항목 수만큼 반복)\n총점: XX/"+maxScore+"점\n---요약---\n한 문장으로 핵심만 (예: 마네킹 착장 양호, POP 미설치 개선 필요)"});
   userContent.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:photo.split(",")[1]}});
   if(refImgs.length>0){
     refImgs.slice(0,3).forEach(function(img){
@@ -1738,36 +1746,7 @@ function rMap(){
       wrap.appendChild(adminBar);
     }
 
-    // 피드백 토글
-    var fbSec = el("div","map-fb-section");
-    var fbToggle = el("div","map-fb-toggle");
-    var fbs = Object.entries(z.fb||{});
-    fbToggle.textContent = "💬 VMD 피드백 "+(fbs.length?"("+fbs.length+")":"");
-    var fbBody = el("div","map-fb-body"); fbBody.id="fb-body-"+zid;
-    (function(fbBody){fbToggle.onclick=function(){fbBody.classList.toggle("open");};})(fbBody);
-    var fl = el("div","fl2"); fl.id="fl"+zid;
-    if(!fbs.length){fl.innerHTML="<div class='nf'>아직 피드백이 없어요</div>";}
-    else{
-      fbs.forEach(function(en){
-        var fid=en[0],f=en[1];
-        var item=el("div","fi3");
-        var fbt=el("div","ft2");
-        if(f.isA){var tag=el("span","at");tag.textContent="관리자";fbt.appendChild(tag);}
-        fbt.appendChild(txt(f.text));
-        var ftm=el("div","ftm2");ftm.textContent=f.time;fbt.appendChild(ftm);
-        item.appendChild(fbt);
-        if(isA){var fd=el("span","fd2");fd.textContent="x";(function(z,fi){fd.onclick=function(){dMFb(z,fi);};})(zid,fid);item.appendChild(fd);}
-        fl.appendChild(item);
-      });
-    }
-    var fr2 = el("div","fr2");
-    var fi2 = el("textarea","fi2"); fi2.id="fi"+zid; fi2.placeholder="피드백 입력"; fi2.rows=2;
-    var fb2 = el("button","fb2"); fb2.textContent="등록";
-    (function(zid){fb2.onclick=function(){aMFb(zid);};})(zid);
-    fr2.appendChild(fi2); fr2.appendChild(fb2);
-    fbBody.appendChild(fl); fbBody.appendChild(fr2);
-    fbSec.appendChild(fbToggle); fbSec.appendChild(fbBody);
-    wrap.appendChild(fbSec);
+    // 피드백 없음 - 사진만 표시
     gallery.appendChild(wrap);
   });
   el2.appendChild(gallery);
