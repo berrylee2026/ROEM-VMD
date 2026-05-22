@@ -800,22 +800,25 @@ function aiEval(sid,zi,photo){
 
   var criteria={
     "VP":[
-      {no:1,item:"메인VP존 마네킹 전마 상품 풀코디 착장",score:10},
-      {no:2,item:"마네킹 사양 통일",score:10},
-      {no:3,item:"전마 상품 POP 고지",score:10}
+      {no:1,item:"메인VP존 마네킹 전마 상품과 동일하게 풀코디 착장",score:10},
+      {no:2,item:"마네킹 사양 통일 (FRP: 고개방향/손방향 일치, 피노키오: 포징 달라도 무방)",score:10},
+      {no:"공통1",item:"[공통] FRP마네킹 어울리는 신발 착용 (맨발 0점, 양말 2점, 어울리지 않는 신발 감점)",score:5},
+      {no:"공통2",item:"[공통] VP존과 WIN 주변 정리 상태",score:5}
     ],
     "VP 메인 바닥집기":[
-      {no:4,item:"행어링 상품(컬러/아이템) 교육자료와 동일",score:10},
-      {no:5,item:"유사한 간격으로 행어링",score:10}
+      {no:3,item:"행어링 상품의 컬러와 아이템이 교육자료와 동일 (순서 무관, 아이템별 수량 동일, 상의/하의/원피스 등 아이템 종류 동일)",score:10},
+      {no:4,item:"유사한 간격으로 행어링",score:5},
+      {no:5,item:"전마 상품 POP 고지",score:5}
     ],
     "WIN":[
-      {no:6,item:"메인VP존 마네킹 전마 상품 풀코디 착장",score:10},
-      {no:7,item:"마네킹 사양 통일",score:10},
-      {no:8,item:"전마 상품 POP 고지",score:10}
+      {no:6,item:"마네킹 전마 상품과 동일하게 풀코디 착장",score:10},
+      {no:7,item:"마네킹 사양 통일 (FRP: 고개방향/손방향 일치, 피노키오: 포징 달라도 무방)",score:10},
+      {no:8,item:"전마 상품 POP 고지",score:5}
     ],
     "메인 FACE":[
-      {no:9,item:"W1,200 페이스 기준 10SKU 진열(앞보기3, 옆보기7SKU)",score:10},
-      {no:10,item:"행어링 상품(컬러/아이템) 교육자료와 동일",score:10}
+      {no:9,item:"W1,200 페이스 기준 6-8SKU 진열 (앞보기1-3, 옆보기5SKU / 원피스1SKU, 상하의2SKU, 상하의아우터3SKU, 교육자료와 동일하게 구성)",score:10},
+      {no:10,item:"행어링 상품의 컬러와 아이템이 교육자료와 동일 (순서 무관, 아이템별 수량 동일)",score:10},
+      {no:11,item:"전마 상품 POP 고지",score:5}
     ]
   };
 
@@ -1682,7 +1685,7 @@ function rMap(){
       wrap.appendChild(emptyBox);
     }
 
-    // 관리자 액션 바
+    // 관리자 액션 바 - 교체/삭제/구역삭제만
     if(isA){
       var adminBar = el("div","map-gallery-admin-bar");
       var adminName = el("div","map-gallery-admin-name"); adminName.textContent=z.name;
@@ -1702,15 +1705,13 @@ function rMap(){
       wrap.appendChild(adminBar);
     }
 
-    // 피드백 섹션 (토글)
+    // 피드백 토글
     var fbSec = el("div","map-fb-section");
     var fbToggle = el("div","map-fb-toggle");
     var fbs = Object.entries(z.fb||{});
-    fbToggle.innerHTML = "💬 VMD 피드백 "+(fbs.length?"("+fbs.length+")":"");
+    fbToggle.textContent = "💬 VMD 피드백 "+(fbs.length?"("+fbs.length+")":"");
     var fbBody = el("div","map-fb-body"); fbBody.id="fb-body-"+zid;
     (function(fbBody){fbToggle.onclick=function(){fbBody.classList.toggle("open");};})(fbBody);
-
-    // 피드백 목록
     var fl = el("div","fl2"); fl.id="fl"+zid;
     if(!fbs.length){fl.innerHTML="<div class='nf'>아직 피드백이 없어요</div>";}
     else{
