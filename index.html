@@ -1467,20 +1467,19 @@ function rBestStores(){
     return;
   }
 
+  var wrap=el("div","best-wrap");
   ranked.forEach(function(entry){
     var sid=parseInt(entry[0]), rank=entry[1];
     var store=SS.find(function(s){return s.id===sid;});
     if(!store)return;
 
-    // VP 사진 (CZ[0] = VP)
     var vpPhoto=CD[sid][0]&&CD[sid][0].photo?CD[sid][0].photo:null;
-    // AI 총점
     var total=0;
     CZ.forEach(function(_,i){var sc=CD[sid][i]&&CD[sid][i].aiScore;if(sc)total+=sc;});
 
     var card=el("div","best-card "+rankColor[rank]);
 
-    // 매장 정보 먼저
+    // 왼쪽: 매장 정보
     var info=el("div","best-info");
     var rankRow=el("div","best-rank");
     var tp=el("span","best-trophy");tp.textContent=trophy[rank];
@@ -1492,12 +1491,12 @@ function rBestStores(){
     if(total>0){
       var grade=total>=91?"A":total>=81?"B":total>=71?"C":total>=61?"D":total>=51?"E":"F";
       var sc=el("div","best-score");
-      sc.textContent="AI 평가: "+total+"점 · "+grade+"등급 ("+uploadedCount+"/4구역)";
+      sc.textContent=total+"점 · "+grade+"등급 ("+uploadedCount+"/4구역)";
       info.appendChild(sc);
     }
     card.appendChild(info);
 
-    // VP 사진 오른쪽에
+    // 오른쪽: VP 사진
     if(vpPhoto){
       var img=el("img","best-photo");img.src=vpPhoto;
       var vps=vpPhoto;img.onclick=function(){openLb(store.n+" VP",vps);};
@@ -1506,8 +1505,9 @@ function rBestStores(){
       var phEmpty=el("div","best-photo-empty");phEmpty.textContent="📷";
       card.appendChild(phEmpty);
     }
-    el2.appendChild(card);
+    wrap.appendChild(card);
   });
+  el2.appendChild(wrap);
 }
 
 function getRank(){
