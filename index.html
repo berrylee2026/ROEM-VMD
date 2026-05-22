@@ -1637,6 +1637,23 @@ function updateUploadAlert(){
 function openLb(l,s){document.getElementById("lbi").src=s;document.getElementById("lbt").textContent=l;document.getElementById("lb").classList.add("on");}
 function closeLb(){document.getElementById("lb").classList.remove("on");}
 
+function moveZone(zid, dir){
+  if(!isA) return;
+  var zones = Object.entries(mapZones)
+    .filter(function(e){return e[0]!=="new_collection";})
+    .sort(function(a,b){return (a[1].order||0)-(b[1].order||0);});
+  var idx = zones.findIndex(function(e){return e[0]===zid;});
+  if(idx===-1) return;
+  var newIdx = idx + dir;
+  if(newIdx < 0 || newIdx >= zones.length) return;
+  // 두 구역의 order 값 스왑
+  var aId = zones[idx][0], bId = zones[newIdx][0];
+  var aOrder = mapZones[aId].order || idx;
+  var bOrder = mapZones[bId].order || newIdx;
+  db.ref("mapZones/"+aId+"/order").set(bOrder);
+  db.ref("mapZones/"+bId+"/order").set(aOrder);
+}
+
 function upNCPh(){
   if(!isA)return;
   pick(function(f){comp(f,800,0.75,function(c){
@@ -1758,6 +1775,17 @@ function rMap(){
     // 관리자 액션 바
     if(isA){
       var adminBar = el("div","map-gallery-admin-bar");
+      // 위아래 이동 버튼
+      var mUp = el("span","mu"); mUp.textContent="▲";
+      mUp.style.cssText="font-size:13px;padding:5px 8px";
+      if(idx===0) mUp.style.opacity="0.3";
+      (function(zid,idx){mUp.onclick=function(){if(idx>0)moveZone(zid,-1);};})(zid,idx);
+      adminBar.appendChild(mUp);
+      var mDn = el("span","mu"); mDn.textContent="▼";
+      mDn.style.cssText="font-size:13px;padding:5px 8px";
+      if(idx===zones.length-1) mDn.style.opacity="0.3";
+      (function(zid,idx){mDn.onclick=function(){if(idx<zones.length-1)moveZone(zid,1);};})(zid,idx);
+      adminBar.appendChild(mDn);
       var upBtn = el("span","mu"); upBtn.textContent="교체";
       (function(zid){upBtn.onclick=function(){upMPh(zid);};})(zid);
       adminBar.appendChild(upBtn);
