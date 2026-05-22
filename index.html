@@ -332,7 +332,7 @@ textarea:disabled{opacity:0.4}
   </div>
 </div>
 <div class="hdr">
-  <div><h1>ROEM VMD</h1><p>2026.04.20</p></div>
+  <div><h1>ROEM VMD</h1></div>
   <div class="hr2">
     <div class="ab" id="ab" onclick="toggleAuth()"><span class="adot"></span><span id="albl">일반 유저</span></div>
     <div class="logo">ROEM</div>
@@ -1110,7 +1110,54 @@ function rMqList(){
   var listEl = document.getElementById("mq-list");
   if(!addBar || !listEl) return;
 
-  // 작성 카드 (모든 유저 가능)
+  // 게시물 목록 먼저 (최신순)
+  listEl.innerHTML = "";
+  var posts = Object.entries(mqData).sort(function(a,b){
+    return (b[1].createdAt||0)-(a[1].createdAt||0);
+  });
+
+  posts.forEach(function(entry){
+    var kid=entry[0], post=entry[1];
+    var card = el("div","mq-card");
+    if(post.photo){
+      var pw = el("div","mq-photo-wrap");
+      var img = el("img"); img.src=post.photo;
+      var ps=post.photo, pn=post.storeName||"MQ착장";
+      img.onclick=function(){openLb(pn,ps);};
+      pw.appendChild(img); card.appendChild(pw);
+    } else {
+      var pe = el("div","mq-photo-empty");
+      pe.innerHTML="<div class='phico'>📷</div><div class='phtxt'>사진 없음</div>";
+      card.appendChild(pe);
+    }
+    var body = el("div","mq-body");
+    var meta = el("div","mq-meta");
+    var storeSpan = el("span","mq-store"); storeSpan.textContent=post.storeName||"매장 미상";
+    var dateSpan = el("span","mq-date"); dateSpan.textContent=post.date||"";
+    meta.appendChild(storeSpan); meta.appendChild(dateSpan);
+    body.appendChild(meta);
+    if(post.concept){
+      var cLabel=el("div","mq-concept-label");cLabel.textContent="착장 컨셉";
+      var cTxt=el("div","mq-concept");cTxt.textContent=post.concept;
+      body.appendChild(cLabel);body.appendChild(cTxt);
+    }
+    if(post.code){
+      var cdLabel=el("div","mq-code-label");cdLabel.textContent="상품 코드";
+      var cdTxt=el("div","mq-code");cdTxt.textContent=post.code;
+      body.appendChild(cdLabel);body.appendChild(cdTxt);
+    }
+    if(isA){
+      var acts=el("div","mq-actions");
+      var delBtn=el("button","mq-del-btn");delBtn.textContent="삭제";
+      (function(kid){delBtn.onclick=function(){if(confirm("삭제할까요?"))db.ref("mqPosts/"+kid).remove();};})(kid);
+      acts.appendChild(delBtn);
+      body.appendChild(acts);
+    }
+    card.appendChild(body);
+    listEl.appendChild(card);
+  });
+
+  // 작성 카드 (아래에 배치)
   addBar.innerHTML = "";
   var addCard = el("div","mq-add-card");
   var addTitle = el("div","mq-add-title"); addTitle.textContent = "✏️ MQ 착장 제안 등록";
@@ -1166,66 +1213,11 @@ function rMqList(){
   addCard.appendChild(submitBtn);
   addBar.appendChild(addCard);
 
-  // 게시물 목록
-  listEl.innerHTML = "";
-  var posts = Object.entries(mqData).sort(function(a,b){
-    return (b[1].createdAt||0)-(a[1].createdAt||0);
-  });
-
   if(!posts.length){
-    var empty = el("div"); empty.style.cssText="text-align:center;padding:40px;font-size:13px;color:#aaa";
-    empty.textContent="아직 등록된 MQ 착장이 없어요";
-    listEl.appendChild(empty);
-    return;
+    var empty2 = el("div"); empty2.style.cssText="text-align:center;padding:30px;font-size:13px;color:#aaa";
+    empty2.textContent="아직 등록된 MQ 착장이 없어요";
+    listEl.insertBefore(empty2, listEl.firstChild);
   }
-
-  posts.forEach(function(entry){
-    var kid=entry[0], post=entry[1];
-    var card = el("div","mq-card");
-
-    // 사진
-    if(post.photo){
-      var pw = el("div","mq-photo-wrap");
-      var img = el("img"); img.src=post.photo;
-      var ps=post.photo, pn=post.storeName||"MQ착장";
-      img.onclick=function(){openLb(pn,ps);};
-      pw.appendChild(img); card.appendChild(pw);
-    } else {
-      var pe = el("div","mq-photo-empty");
-      pe.innerHTML="<div class='phico'>📷</div><div class='phtxt'>사진 없음</div>";
-      card.appendChild(pe);
-    }
-
-    // 본문
-    var body = el("div","mq-body");
-    var meta = el("div","mq-meta");
-    var storeSpan = el("span","mq-store"); storeSpan.textContent=post.storeName||"매장 미상";
-    var dateSpan = el("span","mq-date"); dateSpan.textContent=post.date||"";
-    meta.appendChild(storeSpan); meta.appendChild(dateSpan);
-    body.appendChild(meta);
-
-    if(post.concept){
-      var cLabel=el("div","mq-concept-label");cLabel.textContent="착장 컨셉";
-      var cTxt=el("div","mq-concept");cTxt.textContent=post.concept;
-      body.appendChild(cLabel);body.appendChild(cTxt);
-    }
-    if(post.code){
-      var cdLabel=el("div","mq-code-label");cdLabel.textContent="상품 코드";
-      var cdTxt=el("div","mq-code");cdTxt.textContent=post.code;
-      body.appendChild(cdLabel);body.appendChild(cdTxt);
-    }
-
-    // 삭제 버튼 (관리자만)
-    if(isA){
-      var acts=el("div","mq-actions");
-      var delBtn=el("button","mq-del-btn");delBtn.textContent="삭제";
-      (function(kid){delBtn.onclick=function(){if(confirm("삭제할까요?"))db.ref("mqPosts/"+kid).remove();};})(kid);
-      acts.appendChild(delBtn);
-      body.appendChild(acts);
-    }
-    card.appendChild(body);
-    listEl.appendChild(card);
-  });
 }
 
 function submitMq(){
@@ -1645,6 +1637,20 @@ function updateUploadAlert(){
 function openLb(l,s){document.getElementById("lbi").src=s;document.getElementById("lbt").textContent=l;document.getElementById("lb").classList.add("on");}
 function closeLb(){document.getElementById("lb").classList.remove("on");}
 
+function upNCPh(){
+  if(!isA)return;
+  pick(function(f){comp(f,800,0.75,function(c){
+    db.ref("mapZones/new_collection").set({name:"New Collection",photo:c,order:-1});
+    // 진열맵 첫 업로드 타임스탬프
+    db.ref("mapDeployedAt").once("value").then(function(s){
+      if(!s.val()) db.ref("mapDeployedAt").set(Date.now());
+    });
+  });});
+}
+function delNCPh(){
+  if(!isA||!confirm("New Collection 사진을 삭제할까요?"))return;
+  db.ref("mapZones/new_collection/photo").set(null);
+}
 function renderMapTimerBar(){
   var bar = document.getElementById("map-timer-bar");
   if(!bar) return;
@@ -1687,13 +1693,40 @@ function rMap(){
   }
 
   var gallery = el("div","map-gallery");
-  var zones = Object.entries(mapZones).sort(function(a,b){return (a[1].order||0)-(b[1].order||0);});
 
-  if(!zones.length){
-    var empty2 = el("div"); empty2.style.cssText="text-align:center;padding:40px;font-size:13px;color:#aaa";
-    empty2.textContent = isA ? "구역을 추가해 주세요" : "아직 등록된 구역이 없어요";
-    el2.appendChild(empty2); return;
+  // New Collection 고정 구역 (맨 앞)
+  var ncData = mapZones["new_collection"] || {};
+  var ncWrap = el("div","map-gallery-item");
+  if(ncData.photo){
+    var ncImg = el("img"); ncImg.src=ncData.photo;
+    var ncSrc=ncData.photo; ncImg.onclick=function(){openLb("New Collection",ncSrc);};
+    ncWrap.appendChild(ncImg);
+    var ncLbl = el("div","map-gallery-item-label");
+    var ncNm = el("span","map-gallery-item-name"); ncNm.textContent="✨ New Collection";
+    var ncIdx = el("span","map-gallery-item-idx"); ncIdx.textContent="NEW";
+    ncLbl.appendChild(ncNm); ncLbl.appendChild(ncIdx);
+    ncWrap.appendChild(ncLbl);
+  } else {
+    var ncEmpty = el("div","map-gallery-empty");
+    if(isA){ncEmpty.onclick=function(){upNCPh();};}
+    var ncIco=el("div","phico"); ncIco.textContent="✨";
+    var ncTxt=el("div","phtxt"); ncTxt.textContent=isA?"New Collection 이미지 업로드":"New Collection 준비 중";
+    ncEmpty.appendChild(ncIco); ncEmpty.appendChild(ncTxt);
+    ncWrap.appendChild(ncEmpty);
   }
+  if(isA){
+    var ncBar = el("div","map-gallery-admin-bar");
+    var ncUp = el("span","mu"); ncUp.textContent="교체"; ncUp.onclick=upNCPh;
+    ncBar.appendChild(ncUp);
+    if(ncData.photo){
+      var ncDel = el("span","md"); ncDel.textContent="사진삭제"; ncDel.onclick=delNCPh;
+      ncBar.appendChild(ncDel);
+    }
+    ncWrap.appendChild(ncBar);
+  }
+  gallery.appendChild(ncWrap);
+
+  var zones = Object.entries(mapZones).filter(function(e){return e[0]!=="new_collection";}).sort(function(a,b){return (a[1].order||0)-(b[1].order||0);});
 
   zones.forEach(function(entry, idx){
     var zid=entry[0], z=entry[1];
