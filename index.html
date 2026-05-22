@@ -483,11 +483,22 @@ db.ref("impl").on("value", function(s) {
 db.ref("core").on("value", function(s) {
   var d=s.val()||{};
   SS.forEach(function(st){
-    if(d[st.id])CZ.forEach(function(_,i){
-      if(d[st.id][i]){CD[st.id][i].checked=d[st.id][i].checked||false;CD[st.id][i].photo=d[st.id][i].photo||null;CD[st.id][i].fb=d[st.id][i].fb||{};}
-    });
+    if(d[st.id]){
+      CZ.forEach(function(_,i){
+        if(d[st.id][i]){
+          CD[st.id][i].checked=d[st.id][i].checked||false;
+          CD[st.id][i].photo=d[st.id][i].photo||null;
+          CD[st.id][i].photo2=d[st.id][i].photo2||null;
+          CD[st.id][i].fb=d[st.id][i].fb||{};
+          CD[st.id][i].aiScore=d[st.id][i].aiScore||null;
+        }
+      });
+      CD[st.id].extra=d[st.id].extra||{};
+    }
   });
   rCore(); if(actS)rZC();
+  // 우수매장 탭 열려있으면 갱신
+  if(document.getElementById("pg3")&&document.getElementById("pg3").classList.contains("on")) rBestStores();
 });
 // 진열맵 전체를 Firebase에서 실시간 수신
 db.ref("mapZones").on("value", function(s) {
