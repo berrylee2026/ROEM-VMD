@@ -798,7 +798,7 @@ function aiEval(sid,zi,photo){
     "VP":[
       {no:1,item:"메인VP존 마네킹 전마 상품과 동일하게 풀코디 착장",score:10},
       {no:2,item:"마네킹 사양 통일 (FRP: 고개방향/손방향 일치, 피노키오: 포징 달라도 무방)",score:10},
-      {no:"공통1",item:"[공통] FRP마네킹 어울리는 신발 착용 (맨발 0점, 양말 2점, 어울리지 않는 신발 감점)",score:5},
+      {no:"공통1",item:"[공통-FRP마네킹만 해당] 신발 착용 여부 (FRP마네킹: 맨발 0점/양말 2점/신발 5점, 피노키오마네킹: 다리 없으므로 신발 항목 해당없음 → 자동 5점 부여)",score:5},
       {no:"공통2",item:"[공통] VP존과 WIN 주변 정리 상태",score:5}
     ],
     "VP 메인 바닥집기":[
@@ -846,7 +846,7 @@ function aiEval(sid,zi,photo){
   Object.values(iPins).forEach(function(p){if(p.photo)refImgs.push(p.photo);});
 
   var userContent=[];
-  userContent.push({type:"text",text:"당신은 패션 브랜드 ROEM의 VMD 전문가입니다.\n\n매장: "+storeName+"\n구역: "+zoneName+customText+"\n\n[평가 기준]\n"+criteriaText+(refImgs.length>0?"\n\n[참고 이미지 안내] 함께 제공된 이미지는 매장 도면 및 진열맵(VP/WIN/메인FACE) 기준 사진입니다. 이를 기준으로 업로드된 매장 사진과 비교하여 평가하세요.":"")+"\n\n위 기준으로 사진을 평가하세요. 매장 특이사항과 도면이 있다면 해당 매장 기준에 맞게 평가하세요.\n\n반드시 아래 형식으로만 출력하세요:\n---상세---\nNo.번호 - 점수/만점 - 한줄평가\n(항목 수만큼 반복)\n총점: XX/"+maxScore+"점\n---요약---\n한 문장으로 핵심만 (예: 마네킹 착장 양호, POP 미설치 개선 필요)"});
+  userContent.push({type:"text",text:"당신은 패션 브랜드 ROEM의 VMD 전문가입니다.\n\n매장: "+storeName+"\n구역: "+zoneName+customText+"\n\n[평가 기준]\n"+criteriaText+(refImgs.length>0?"\n\n[참고 이미지 안내] 함께 제공된 이미지는 매장 도면 및 진열맵(VP/WIN/메인FACE) 기준 사진입니다. 이를 기준으로 업로드된 매장 사진과 비교하여 평가하세요.":"")+"\n\n[마네킹 종류 안내]\n- FRP마네킹: 사람 형태로 발/다리가 있는 마네킹 → 신발 착용 여부 평가\n- 피노키오마네킹: 하부가 봉으로 구성되어 다리/발이 없는 마네킹 → 신발 항목 자동 만점(5점) 부여\n- 사진에서 마네킹 종류를 판단하여 적절히 평가하세요\n\n위 기준으로 사진을 평가하세요. 매장 특이사항과 도면이 있다면 해당 매장 기준에 맞게 평가하세요.\n\n반드시 아래 형식으로만 출력하세요:\n---상세---\nNo.번호 - 점수/만점 - 한줄평가\n(항목 수만큼 반복)\n총점: XX/"+maxScore+"점\n---요약---\n한 문장으로 핵심만 (예: 마네킹 착장 양호, POP 미설치 개선 필요)"});
   userContent.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:photo.split(",")[1]}});
   if(refImgs.length>0){
     refImgs.slice(0,3).forEach(function(img){
@@ -899,15 +899,17 @@ function checkTotalScore(sid){
   var refs=CZ.map(function(_,i){return db.ref("core/"+sid+"/"+i+"/aiScore").once("value");});
   Promise.all(refs).then(function(snaps){
     var scores=snaps.map(function(s){return s.val();});
-    var allDone=scores.every(function(s){return s!==null;});
-    if(!allDone)return;
     var total=scores.reduce(function(a,b){return a+(b||0);},0);
+    var uploadedCount=scores.filter(function(s){return s!==null;}).length;
+    if(uploadedCount===0)return;
     var grade=total>=91?"A등급":total>=81?"B등급":total>=71?"C등급":total>=61?"D등급":total>=51?"E등급":"F등급";
     var storeName=SS.find(function(s){return s.id===sid;}).n;
     var now=new Date();
     var tm=(now.getMonth()+1)+"/"+now.getDate()+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
-    var summaryText="🏆 최종: "+total+"/100점 · "+grade;
-    var detailText="🏆 "+storeName+" 최종 평가\n총점: "+total+"/100점 | "+grade+"\nVP: "+scores[0]+"점 / VP메인바닥집기: "+scores[1]+"점 / WIN: "+scores[2]+"점 / 메인FACE: "+scores[3]+"점";
+    var zoneNames=["VP","VP바닥집기","WIN","메인FACE"];
+    var scoreDetail=scores.map(function(s,i){return zoneNames[i]+": "+(s!==null?s+"점":"미평가");}).join(" / ");
+    var summaryText=(uploadedCount<CZ.length?"📊 현재: ":"🏆 최종: ")+total+"점 · "+grade+" ("+uploadedCount+"/4구역)";
+    var detailText=(uploadedCount<CZ.length?"📊 현재 평가 현황":"🏆 최종 평가")+"\n"+storeName+"\n총점: "+total+"점 | "+grade+"\n"+scoreDetail;
     db.ref("core/"+sid+"/0/fb").push({
       text:summaryText,
       detail:detailText,
@@ -1444,7 +1446,7 @@ function rBestStores(){
 
   if(!ranked.length){
     var empty=el("div","best-empty");
-    empty.textContent="아직 모든 구역 사진이 업로드된 매장이 없어요";
+    empty.textContent="아직 AI 평가된 매장이 없어요";
     el2.appendChild(empty);
     return;
   }
@@ -1480,8 +1482,11 @@ function rBestStores(){
     rankRow.appendChild(tp);rankRow.appendChild(rn);
     var nm=el("div","best-store-name");nm.textContent=store.n;
     info.appendChild(rankRow);info.appendChild(nm);
+    var uploadedCount=CZ.filter(function(_,i){return CD[sid][i]&&CD[sid][i].aiScore!==null&&CD[sid][i].aiScore!==undefined;}).length;
     if(total>0){
-      var sc=el("div","best-score");sc.textContent="AI 평가 총점: "+total+"점";
+      var grade=total>=91?"A":total>=81?"B":total>=71?"C":total>=61?"D":total>=51?"E":"F";
+      var sc=el("div","best-score");
+      sc.textContent="AI 평가: "+total+"점 · "+grade+"등급 ("+uploadedCount+"/4구역)";
       info.appendChild(sc);
     }
     card.appendChild(info);
@@ -1490,20 +1495,16 @@ function rBestStores(){
 }
 
 function getRank(){
-  // 4개 구역 모두 완료된 매장만 대상
+  // 사진이 1장이라도 있고 AI 점수가 있는 매장 대상
   var scored = [];
   SS.forEach(function(s){
-    var done = getDone(s.id);
-    if(done === CZ.length){
-      // aiScore 합산
-      var total = 0;
-      var hasScore = false;
-      CZ.forEach(function(_,i){
-        var sc = CD[s.id][i] && CD[s.id][i].aiScore;
-        if(sc){total+=sc;hasScore=true;}
-      });
-      if(hasScore) scored.push({id:s.id, score:total});
-    }
+    var total = 0;
+    var hasScore = false;
+    CZ.forEach(function(_,i){
+      var sc = CD[s.id][i] && CD[s.id][i].aiScore;
+      if(sc){total+=sc;hasScore=true;}
+    });
+    if(hasScore) scored.push({id:s.id, score:total});
   });
   // 점수 높은 순 정렬
   scored.sort(function(a,b){return b.score-a.score;});
