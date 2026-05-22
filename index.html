@@ -201,21 +201,17 @@ textarea:disabled{opacity:0.4}
 .archive-del-btn{font-size:10px;padding:4px 8px;border-radius:6px;border:0.5px solid #F0997B;background:#FAECE7;color:#993C1D;cursor:pointer;margin:8px}
 .archive-empty{text-align:center;padding:60px 20px;color:#aaa;font-size:13px}
 .map-gallery{display:flex;flex-direction:column;gap:0}
-.map-gallery-item{position:relative;cursor:zoom-in;border-bottom:0.5px solid #e8e5e0}
-.map-gallery-item img{display:block;width:100%;height:auto}
-.map-gallery-item-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.55));padding:10px 12px 8px;display:flex;align-items:flex-end;justify-content:space-between}
-.map-gallery-item-name{font-size:13px;font-weight:600;color:#fff}
-.map-gallery-item-idx{font-size:11px;color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.3);padding:2px 7px;border-radius:10px}
-.map-gallery-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:140px;background:#f8f7f5;border-bottom:0.5px solid #e8e5e0;cursor:pointer}
-.map-gallery-empty .phico{font-size:24px;margin-bottom:4px;color:#ccc}
+.map-gallery-item{border-bottom:3px solid #f8f7f5}
+.map-gallery-item img{display:block;width:100%;height:auto;cursor:zoom-in}
+.map-gallery-item-label{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#fff}
+.map-gallery-item-name{font-size:13px;font-weight:600;color:#1a1a1a}
+.map-gallery-item-idx{font-size:11px;color:#aaa;background:#f5f4f2;padding:2px 7px;border-radius:10px}
+.map-gallery-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;background:#f8f7f5;cursor:pointer}
+.map-gallery-empty .phico{font-size:28px;margin-bottom:6px;color:#ccc}
 .map-gallery-empty .phtxt{font-size:12px;color:#ccc}
-.map-gallery-admin-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f8f7f5;border-bottom:0.5px solid #e8e5e0}
-.map-gallery-admin-name{font-size:12px;color:#1a1a1a;font-weight:500}
+.map-gallery-admin-bar{display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:6px 12px 10px;background:#fff}
+.map-gallery-admin-name{font-size:12px;color:#aaa;flex:1}
 .map-gallery-admin-acts{display:flex;gap:6px}
-.map-fb-section{padding:10px 12px;border-bottom:0.5px solid #f0ede8;background:#fff}
-.map-fb-toggle{font-size:11px;color:#534AB7;cursor:pointer;display:flex;align-items:center;gap:4px}
-.map-fb-body{display:none;margin-top:8px}
-.map-fb-body.open{display:block}
 .mq-card{background:#fff;border-radius:14px;overflow:hidden;border:0.5px solid #e8e5e0;margin-bottom:12px}
 .mq-photo-wrap{width:100%;background:#1a1a1a;overflow:hidden;cursor:zoom-in;position:relative}
 .mq-photo-wrap img{width:100%;height:auto;max-height:80vh;object-fit:contain;display:block;margin:0 auto}
@@ -1710,7 +1706,7 @@ function rMap(){
       var zn=z.name, sr=src;
       img.onclick=function(){openLb(zn,sr);};
       wrap.appendChild(img);
-      // 이름 레이블 (이미지 위에)
+      // 이름 레이블 (이미지 아래)
       var lbl = el("div","map-gallery-item-label");
       var nm = el("span","map-gallery-item-name"); nm.textContent=z.name;
       var idxSpan = el("span","map-gallery-item-idx"); idxSpan.textContent=String(idx+1).padStart(2,"0");
@@ -1726,23 +1722,20 @@ function rMap(){
       wrap.appendChild(emptyBox);
     }
 
-    // 관리자 액션 바 - 교체/삭제/구역삭제만
+    // 관리자 액션 바
     if(isA){
       var adminBar = el("div","map-gallery-admin-bar");
-      var adminName = el("div","map-gallery-admin-name"); adminName.textContent=z.name;
-      var adminActs = el("div","map-gallery-admin-acts");
       var upBtn = el("span","mu"); upBtn.textContent="교체";
       (function(zid){upBtn.onclick=function(){upMPh(zid);};})(zid);
-      adminActs.appendChild(upBtn);
+      adminBar.appendChild(upBtn);
       if(src){
-        var delBtn = el("span","md"); delBtn.textContent="삭제";
+        var delBtn = el("span","md"); delBtn.textContent="사진삭제";
         (function(zid){delBtn.onclick=function(){dMPh(zid);};})(zid);
-        adminActs.appendChild(delBtn);
+        adminBar.appendChild(delBtn);
       }
-      var zDelBtn = el("span","md"); zDelBtn.textContent="구역삭제";
+      var zDelBtn = el("span","md"); zDelBtn.style.cssText="border-color:#ccc;background:#f8f7f5;color:#aaa";zDelBtn.textContent="구역삭제";
       (function(zid){zDelBtn.onclick=function(){delZone(zid);};})(zid);
-      adminActs.appendChild(zDelBtn);
-      adminBar.appendChild(adminName); adminBar.appendChild(adminActs);
+      adminBar.appendChild(zDelBtn);
       wrap.appendChild(adminBar);
     }
 
