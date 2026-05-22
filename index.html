@@ -257,6 +257,14 @@ textarea:disabled{opacity:0.4}
 .best-store-name{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:2px}
 .best-score{font-size:11px;color:#534AB7;font-weight:500}
 .best-empty{text-align:center;padding:60px 20px;color:#aaa;font-size:13px}
+.best-announce-bar{background:#EEEDFE;border:0.5px solid #AFA9EC;border-radius:12px;padding:14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.best-announce-info{font-size:12px;color:#534AB7}
+.best-announce-info strong{display:block;font-size:13px;margin-bottom:2px}
+.best-announce-btn{font-size:12px;padding:8px 16px;border-radius:8px;border:none;background:#534AB7;color:#fff;cursor:pointer;font-family:inherit;font-weight:600;white-space:nowrap}
+.best-announce-btn.cancel{background:#f0ede8;color:#aaa;border:0.5px solid #ddd}
+.best-pending{text-align:center;padding:60px 20px}
+.best-pending-ico{font-size:40px;margin-bottom:10px}
+.best-pending-txt{font-size:14px;color:#aaa}
 .store-criteria{background:#f0eeff;border:0.5px solid #AFA9EC;border-radius:10px;padding:12px;margin-bottom:10px}
 .criteria-title{font-size:11px;font-weight:700;color:#534AB7;letter-spacing:0.04em;margin-bottom:8px}
 .criteria-row{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
@@ -1269,6 +1277,12 @@ function submitMq(){
 
 // ── 아카이브 ──
 var archiveData = {};
+var bestAnnounced = false; // 우수매장 공지 여부
+
+db.ref("bestAnnounced").on("value", function(s){
+  bestAnnounced = s.val() || false;
+  if(document.getElementById("pg3") && document.getElementById("pg3").classList.contains("on")) rBestStores();
+});
 
 db.ref("archive").on("value", function(s){
   archiveData = s.val() || {};
@@ -1442,6 +1456,17 @@ function getWeekStr(){
   return now.getFullYear()+"년 "+week+"주차";
 }
 
+function announceeBest(){
+  if(!isA) return;
+  if(bestAnnounced){
+    if(!confirm("우수매장 공지를 취소할까요?")) return;
+    db.ref("bestAnnounced").set(false);
+  } else {
+    if(!confirm("우수매장을 공지할까요? 일반 유저에게 결과가 공개됩니다.")) return;
+    db.ref("bestAnnounced").set(true);
+  }
+}
+
 function rBestStores(){
   var el2=document.getElementById("best-stores");
   if(!el2)return;
@@ -1457,6 +1482,30 @@ function rBestStores(){
   var ttl=el("div","best-title");ttl.textContent="우수 구현 매장";
   hdr.appendChild(wk);hdr.appendChild(ttl);
   el2.appendChild(hdr);
+
+  // 관리자: 공지 버튼 표시
+  if(isA){
+    var announceBar=el("div","best-announce-bar");
+    var aInfo=el("div","best-announce-info");
+    var aStrong=el("strong");aStrong.textContent=bestAnnounced?"📢 공지 중":"⏸️ 공지 대기 중";
+    var aDesc=el("span");aDesc.textContent=bestAnnounced?"일반 유저에게 결과가 공개되어 있어요":"공지하기 전까지 관리자만 결과를 볼 수 있어요";
+    aInfo.appendChild(aStrong);aInfo.appendChild(aDesc);
+    var aBtn=el("button","best-announce-btn"+(bestAnnounced?" cancel":""));
+    aBtn.textContent=bestAnnounced?"공지 취소":"📢 우수매장 공지하기";
+    aBtn.onclick=announceeBest;
+    announceBar.appendChild(aInfo);announceBar.appendChild(aBtn);
+    el2.appendChild(announceBar);
+  }
+
+  // 일반 유저이고 공지 안 됐으면 대기 화면
+  if(!isA && !bestAnnounced){
+    var pending=el("div","best-pending");
+    var pIco=el("div","best-pending-ico");pIco.textContent="🏆";
+    var pTxt=el("div","best-pending-txt");pTxt.textContent="우수매장 선정 결과를 준비 중이에요";
+    pending.appendChild(pIco);pending.appendChild(pTxt);
+    el2.appendChild(pending);
+    return;
+  }
 
   // 순위 있는 매장 찾기
   var ranked=Object.entries(rankMap).filter(function(e){return e[1]<=3;}).sort(function(a,b){return a[1]-b[1];});
