@@ -465,6 +465,11 @@ var mapZones = {};
 var mapDeployedAt = null;
 var storeCriteria = {}; // {sid: {VP:"...", "VP 메인 바닥집기":"...", WIN:"...", "메인 FACE":"..."}} // zid -> {name, photo, order, fb}
 
+db.ref("storeCriteria").on("value", function(s){
+  storeCriteria = s.val() || {};
+  if(actS) rZC();
+});
+
 function sync() {
   for (var i=0;i<3;i++) {
     var sd=document.getElementById("sd"+i); if(sd)sd.classList.add("on");
@@ -1475,17 +1480,7 @@ function rBestStores(){
 
     var card=el("div","best-card "+rankColor[rank]);
 
-    // VP 사진
-    if(vpPhoto){
-      var img=el("img","best-photo");img.src=vpPhoto;
-      var vps=vpPhoto;img.onclick=function(){openLb(store.n+" VP",vps);};
-      card.appendChild(img);
-    } else {
-      var phEmpty=el("div","best-photo-empty");phEmpty.textContent="VP 사진 없음";
-      card.appendChild(phEmpty);
-    }
-
-    // 매장 정보
+    // 매장 정보 먼저
     var info=el("div","best-info");
     var rankRow=el("div","best-rank");
     var tp=el("span","best-trophy");tp.textContent=trophy[rank];
@@ -1501,6 +1496,16 @@ function rBestStores(){
       info.appendChild(sc);
     }
     card.appendChild(info);
+
+    // VP 사진 오른쪽에
+    if(vpPhoto){
+      var img=el("img","best-photo");img.src=vpPhoto;
+      var vps=vpPhoto;img.onclick=function(){openLb(store.n+" VP",vps);};
+      card.appendChild(img);
+    } else {
+      var phEmpty=el("div","best-photo-empty");phEmpty.textContent="📷";
+      card.appendChild(phEmpty);
+    }
     el2.appendChild(card);
   });
 }
